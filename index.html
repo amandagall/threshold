@@ -120,6 +120,8 @@
       text-align: center;
       max-width: 480px;
       width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* ── TYPOGRAPHY ── */
@@ -151,18 +153,18 @@
       color: var(--text-muted);
       text-align: center;
       letter-spacing: 0.04em;
-      margin-bottom: 3rem;
+      margin-bottom: 0;
     }
 
     .body-copy {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       line-height: 1.85;
       color: rgba(242, 237, 228, 0.7);
       text-align: center;
       max-width: 420px;
-      margin-bottom: 2.5rem;
+      margin-bottom: 0;
     }
 
     .body-copy em {
@@ -183,6 +185,12 @@
       padding: 0.85rem 2.5rem;
       cursor: pointer;
       transition: border-color 0.3s ease, background 0.3s ease;
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 10;
     }
 
     .btn:hover {
@@ -259,11 +267,11 @@
     }
 
     .privacy-note {
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       color: rgba(242, 237, 228, 0.3);
       text-align: center;
       line-height: 1.6;
-      margin-bottom: 2.5rem;
+      margin-bottom: 0;
       max-width: 300px;
     }
 
@@ -380,7 +388,7 @@
         </svg>
       </div>
       <h2 class="headline" id="confirm-headline" style="font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 1.25rem;">Welcome.</h2>
-      <p class="body-copy" style="margin-bottom: 0;">
+      <p class="body-copy" style="margin-bottom: 0; font-size: 1.1rem;">
         Your time capsule is open.<br/>
         Over the coming year, three letters will find you — each carrying questions to answer honestly. Your words will be sealed inside.
       </p>
