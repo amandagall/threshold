@@ -278,8 +278,8 @@
     /* ── CONFIRMATION ── */
     #s5 .arrival-date {
       margin-top: 2rem;
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
       color: var(--gold);
     }
 
@@ -301,7 +301,7 @@
     <div class="inner">
       <p class="wordmark-inline">Threshold</p>
       <div class="rule"></div>
-      <h1 class="headline">Who you've been deserves&nbsp;a&nbsp;proper&nbsp;goodbye.</h1>
+      <h1 class="headline">Who you've been deserves a proper goodbye.</h1>
       <p class="subtext">For the ones who are retiring — this is that moment.</p>
       <button class="btn" onclick="go(2)">I'm ready</button>
     </div>
@@ -321,7 +321,7 @@
 
   <!-- SCREEN 3 — THE MECHANICS -->
   <section class="screen" id="s3">
-    <div class="inner">
+    <div class="inner" style="padding-bottom: 3rem;">
       <div class="capsule-wrap">
         <svg width="120" height="110" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="An open time capsule with letters inside">
           <rect x="12" y="48" width="96" height="58" rx="3" fill="#2A2820" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5"/>
@@ -346,7 +346,7 @@
 
   <!-- SCREEN 4 — DETAILS FORM -->
   <section class="screen" id="s4">
-    <div class="inner" style="max-width: 480px;">
+    <div class="inner" style="max-width: 480px; text-align: center;">
       <p class="label">Tell us about yourself</p>
       <h2 class="headline" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem;">Where should<br/>your first letter<br/>arrive?</h2>
 
@@ -365,7 +365,7 @@
         <input type="date" id="retdate" />
       </div>
 
-      <p class="privacy-note">Your letters are private. We will never share your information or your words with anyone.</p>
+      <p class="privacy-note" style="margin-bottom: 2rem;">Your letters are private. We will never share your information or your words with anyone.</p>
 
       <button class="btn" onclick="handleSignup()">Open my time capsule</button>
     </div>
