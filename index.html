@@ -395,7 +395,7 @@
       </div>
       <h2 class="headline" id="confirm-headline" style="font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 1.25rem;">Welcome.</h2>
       <p class="body-copy" style="margin-bottom: 0; font-size: 1.1rem;">
-        Your time capsule is open.<br/>
+        Your time capsule is open.<br/><br/>
         Over the coming year, three letters will find you — each carrying questions to answer honestly. Your words will be sealed inside.
       </p>
       <p class="arrival-date" id="arrival-date-text"></p>
@@ -450,8 +450,8 @@
     });
 
     document.getElementById('confirm-headline').textContent = 'Welcome, ' + fname + '.';
-    document.getElementById('arrival-date-text').textContent =
-      'Your first letter arrives on ' + formatted + '. Watch your inbox.';
+    document.getElementById('arrival-date-text').innerHTML =
+      'Your first letter arrives on ' + formatted + '.<br/>Watch your inbox.';
 
     go(5);
   }
