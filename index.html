@@ -1,14 +1,448 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Threshold</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1>Who you've been deserves a proper goodbye.</h1>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threshold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1C1C1A;
+      --gold: #C9A96E;
+      --gold-dim: rgba(201, 169, 110, 0.3);
+      --cream: #F2EDE4;
+      --text-muted: rgba(242, 237, 228, 0.45);
+      --dot-inactive: rgba(242, 237, 228, 0.2);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* ── SCREEN SYSTEM ── */
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.9s ease;
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── PROGRESS DOTS ── */
+    .dots {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--dot-inactive);
+      transition: background 0.6s ease, transform 0.6s ease;
+    }
+
+    .dot.active {
+      background: var(--gold);
+      transform: scale(1.2);
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .label {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2rem;
+    }
+
+    .headline {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      line-height: 1.15;
+      color: var(--cream);
+      text-align: center;
+      max-width: 600px;
+      margin-bottom: 1.25rem;
+    }
+
+    .subtext {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.04em;
+      margin-bottom: 3rem;
+    }
+
+    /* ── BUTTON ── */
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: none;
+      border: 1px solid var(--gold-dim);
+      padding: 0.85rem 2.5rem;
+      cursor: pointer;
+      transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.06);
+    }
+
+    /* ── WORDMARK ── */
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: 3rem;
+    }
+
+    /* ── SCREEN 1 — ARRIVAL ── */
+    #s1 .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Decorative line */
+    #s1 .rule {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--gold-dim));
+      margin-bottom: 2rem;
+    }
+
+    /* ── SCREEN 2 — THE PROMISE ── */
+    #s2 .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 540px;
+    }
+
+    #s2 .capsule-visual {
+      margin-bottom: 2.5rem;
+    }
+
+    #s2 .promise-body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: rgba(242, 237, 228, 0.7);
+      text-align: center;
+      max-width: 440px;
+      margin-bottom: 2.5rem;
+    }
+
+    #s2 .promise-body em {
+      color: var(--cream);
+      font-style: normal;
+    }
+
+    /* ── SCREEN 3 — DETAILS FORM ── */
+    #s3 .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    #s3 .headline {
+      margin-bottom: 2.5rem;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: rgba(242, 237, 228, 0.04);
+      border: none;
+      border-bottom: 1px solid rgba(242, 237, 228, 0.15);
+      padding: 0.65rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-bottom-color: var(--gold);
+    }
+
+    .form-group input::placeholder {
+      color: rgba(242, 237, 228, 0.2);
+    }
+
+    .privacy-note {
+      font-size: 0.72rem;
+      color: rgba(242, 237, 228, 0.3);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      max-width: 340px;
+    }
+
+    /* ── SCREEN 4 — CONFIRMATION ── */
+    #s4 .inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    #s4 .headline {
+      margin-bottom: 1.25rem;
+    }
+
+    #s4 .confirmation-body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.95rem;
+      line-height: 1.85;
+      color: rgba(242, 237, 228, 0.65);
+      max-width: 420px;
+      text-align: center;
+    }
+
+    #s4 .arrival-date {
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      color: var(--gold);
+    }
+
+    /* ── TIME CAPSULE SVG ASSET ── */
+    .capsule-svg {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- SCREEN 1 — ARRIVAL -->
+  <section class="screen active" id="s1">
+    <div class="inner">
+      <p class="wordmark">Threshold</p>
+      <div class="rule"></div>
+      <h1 class="headline">Who you've been deserves&nbsp;a&nbsp;proper&nbsp;goodbye.</h1>
+      <p class="subtext">For the ones who are retiring — this is that moment.</p>
+      <button class="btn" onclick="go(2)">I'm ready</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2 — THE PROMISE + TIME CAPSULE VISUAL -->
+  <section class="screen" id="s2">
+    <div class="inner">
+
+      <!-- Time Capsule Visual -->
+      <div class="capsule-visual">
+        <svg class="capsule-svg" width="120" height="110" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="An open time capsule box with letters inside">
+          <!-- Box body -->
+          <rect x="12" y="48" width="96" height="58" rx="3" fill="#2A2820" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5"/>
+          <!-- Box interior shadow -->
+          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.6"/>
+          <!-- Letter 1 (back) -->
+          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.35" transform="rotate(-8 28 40)"/>
+          <!-- Letter 2 (middle) -->
+          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" transform="rotate(2 42 38)"/>
+          <!-- Letter 3 (front) -->
+          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.7" transform="rotate(-3 50 42)"/>
+          <!-- Envelope V on front letter -->
+          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" fill="none" transform="rotate(-3 50 42)"/>
+          <!-- Box lid (open, tilted back) -->
+          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5" transform="rotate(-22 60 54)"/>
+          <!-- Lid inner face -->
+          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.4" transform="rotate(-22 60 54)"/>
+          <!-- Gold accent line on lid -->
+          <line x1="22" y1="30" x2="98" y2="30" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.25" transform="rotate(-22 60 54)"/>
+        </svg>
+      </div>
+
+      <h2 class="headline" style="font-size: clamp(1.5rem, 3.5vw, 2.25rem); margin-bottom: 1.5rem;">A year of honest questions.<br/>Sealed until you're ready.</h2>
+
+      <p class="promise-body">
+        Over the coming year, <em>three letters</em> will find you — each carrying questions worth sitting with. You'll answer honestly, in your own time.<br/><br/>
+        Your words are sealed inside a time capsule. When the moment is right, you'll open it — and <em>read yourself back to yourself.</em> Threshold will be there to witness it.
+      </p>
+
+      <button class="btn" onclick="go(3)">Continue</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 3 — DETAILS FORM -->
+  <section class="screen" id="s3">
+    <div class="inner">
+      <p class="label">Tell us about yourself</p>
+      <h2 class="headline">Where should your first letter arrive?</h2>
+
+      <div class="form-group">
+        <label for="fname">First name</label>
+        <input type="text" id="fname" placeholder="Your name" autocomplete="given-name" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="This is where your letters arrive" autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label for="retdate">Retirement date</label>
+        <input type="date" id="retdate" />
+      </div>
+
+      <p class="privacy-note">Your letters are private. We will never share your information or your words with anyone.</p>
+
+      <button class="btn" onclick="handleSignup()">Open my time capsule</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 4 — CONFIRMATION -->
+  <section class="screen" id="s4">
+    <div class="inner">
+      <div class="capsule-visual" style="margin-bottom: 2rem;">
+        <!-- Reuse capsule SVG, same as screen 2 -->
+        <svg class="capsule-svg" width="100" height="92" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="12" y="48" width="96" height="58" rx="3" fill="#2A2820" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5"/>
+          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.6"/>
+          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.35" transform="rotate(-8 28 40)"/>
+          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" transform="rotate(2 42 38)"/>
+          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.7" transform="rotate(-3 50 42)"/>
+          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" fill="none" transform="rotate(-3 50 42)"/>
+          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5" transform="rotate(-22 60 54)"/>
+          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.4" transform="rotate(-22 60 54)"/>
+          <line x1="22" y1="30" x2="98" y2="30" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.25" transform="rotate(-22 60 54)"/>
+        </svg>
+      </div>
+
+      <h2 class="headline" id="confirm-headline">Welcome.</h2>
+      <p class="confirmation-body">
+        Your time capsule is open.<br/>
+        Over the coming year, three letters will find you — each carrying questions to answer honestly. Your words will be sealed inside.
+      </p>
+      <p class="arrival-date" id="arrival-date-text"></p>
+    </div>
+  </section>
+
+</div>
+
+<!-- PROGRESS DOTS -->
+<div class="dots" id="dots">
+  <div class="dot active"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+  <div class="dot"></div>
+</div>
+
+<script>
+  let current = 1;
+
+  function go(n) {
+    document.getElementById('s' + current).classList.remove('active');
+    document.getElementById('s' + n).classList.add('active');
+    current = n;
+    updateDots();
+  }
+
+  function updateDots() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current - 1);
+    });
+  }
+
+  function handleSignup() {
+    const fname = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const retdate = document.getElementById('retdate').value;
+
+    // Basic validation — you'll replace this with real Supabase logic
+    if (!fname || !email || !retdate) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    // Calculate first letter date (14 days before retirement date)
+    const ret = new Date(retdate + 'T12:00:00');
+    const firstLetter = new Date(ret);
+    firstLetter.setDate(firstLetter.getDate() - 14);
+
+    const formatted = firstLetter.toLocaleDateString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric'
+    });
+
+    // Update confirmation screen
+    document.getElementById('confirm-headline').textContent = 'Welcome, ' + fname + '.';
+    document.getElementById('arrival-date-text').textContent =
+      'Your first letter arrives on ' + formatted + '. Watch your inbox.';
+
+    go(4);
+  }
+</script>
+
+</body>
 </html>
