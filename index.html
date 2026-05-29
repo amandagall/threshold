@@ -6,17 +6,18 @@
   <title>Threshold</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg: #1C1C1A;
       --gold: #C9A96E;
-      --gold-dim: rgba(201, 169, 110, 0.3);
+      --gold-dim: rgba(201, 169, 110, 0.28);
+      --gold-glow: rgba(201, 169, 110, 0.08);
       --cream: #F2EDE4;
-      --text-muted: rgba(242, 237, 228, 0.45);
-      --dot-inactive: rgba(242, 237, 228, 0.2);
+      --text-muted: rgba(242, 237, 228, 0.42);
+      --dot-inactive: rgba(242, 237, 228, 0.18);
     }
 
     html, body {
@@ -27,6 +28,17 @@
       font-weight: 300;
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
+    }
+
+    /* ── SUBTLE GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.6;
     }
 
     /* ── SCREEN SYSTEM ── */
@@ -49,7 +61,7 @@
       padding: 2rem;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.9s ease;
+      transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .screen.active {
@@ -57,59 +69,59 @@
       pointer-events: all;
     }
 
-    /* ── WORDMARK ── */
+    /* ── FIXED WORDMARK (screens 2–5) ── */
     .wordmark {
       position: fixed;
-      top: 2rem;
+      top: 2.25rem;
       left: 50%;
       transform: translateX(-50%);
       font-family: 'DM Serif Display', serif;
       font-style: italic;
-      font-size: 1rem;
-      letter-spacing: 0.08em;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
       color: var(--gold);
       z-index: 20;
       white-space: nowrap;
       opacity: 0;
-      transition: opacity 0.9s ease;
+      transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .wordmark.visible {
-      opacity: 1;
-    }
+    .wordmark.visible { opacity: 1; }
 
     /* ── SCREEN 1 INLINE WORDMARK ── */
     .wordmark-inline {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
-      font-size: 1rem;
-      letter-spacing: 0.08em;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
       color: var(--gold);
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
     }
 
     /* ── PROGRESS DOTS ── */
     .dots {
       position: fixed;
-      bottom: 2.5rem;
+      bottom: 2.75rem;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      align-items: center;
       z-index: 10;
     }
 
     .dot {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
       background: var(--dot-inactive);
-      transition: background 0.6s ease, transform 0.6s ease;
+      transition: background 0.7s ease, width 0.7s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.7s ease;
     }
 
     .dot.active {
       background: var(--gold);
-      transform: scale(1.2);
+      width: 20px;
+      border-radius: 2px;
     }
 
     /* ── SHARED INNER ── */
@@ -120,19 +132,18 @@
       text-align: center;
       max-width: 480px;
       width: 100%;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     /* ── TYPOGRAPHY ── */
     .label {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
+      opacity: 0.85;
     }
 
     .headline {
@@ -146,49 +157,46 @@
       margin-bottom: 1.25rem;
     }
 
-
-
     .subtext {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--text-muted);
       text-align: center;
-      letter-spacing: 0.04em;
-      margin-bottom: 0;
+      letter-spacing: 0.03em;
+      line-height: 1.7;
     }
 
     .body-copy {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 1.1rem;
-      line-height: 1.85;
-      color: rgba(242, 237, 228, 0.7);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: rgba(242, 237, 228, 0.68);
       text-align: center;
       max-width: 420px;
-      margin-bottom: 0;
     }
 
     .body-copy em {
       color: var(--cream);
-      font-style: normal;
+      font-style: italic;
     }
 
     /* ── BUTTON ── */
     .btn {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
-      font-size: 0.8rem;
-      letter-spacing: 0.14em;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--gold);
       background: none;
       border: 1px solid var(--gold-dim);
-      padding: 0.85rem 2.5rem;
+      padding: 0.9rem 2.75rem;
       cursor: pointer;
-      transition: border-color 0.3s ease, background 0.3s ease;
+      transition: border-color 0.4s ease, background 0.4s ease, color 0.4s ease;
       position: fixed;
-      bottom: 5rem;
+      bottom: 5.5rem;
       left: 50%;
       transform: translateX(-50%);
       white-space: nowrap;
@@ -197,108 +205,167 @@
 
     .btn:hover {
       border-color: var(--gold);
-      background: rgba(201, 169, 110, 0.06);
+      background: rgba(201, 169, 110, 0.07);
     }
 
     /* ── SCREEN 1 ── */
-    #s1 .inner {
-      max-width: 860px;
-    }
+    #s1 .inner { max-width: 860px; }
 
     #s1 .rule {
       width: 1px;
-      height: 60px;
+      height: 56px;
       background: linear-gradient(to bottom, transparent, var(--gold-dim));
       margin-bottom: 2rem;
     }
 
-    #s1 .wordmark-inline {
-      font-family: 'DM Serif Display', serif;
-      font-style: italic;
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      color: var(--gold);
-      margin-bottom: 3rem;
+    /* ── SCREEN 3 CAPSULE ── */
+    .capsule-wrap {
+      margin-bottom: 2rem;
     }
 
-    /* ── FORM ── */
-    #s4 .inner {
-      max-width: 420px;
-    }
+    /* ── FORM SCREEN ── */
+    #s4 .inner { max-width: 440px; }
 
     .form-group {
       width: 300px;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.5rem;
       text-align: left;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.7rem;
-      letter-spacing: 0.14em;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 0.5rem;
-      text-align: left;
+      margin-bottom: 0.6rem;
+      opacity: 0.85;
     }
 
     .form-group input {
       width: 100%;
-      background: rgba(242, 237, 228, 0.07);
+      background: rgba(242, 237, 228, 0.05);
       border: none;
-      border-bottom: 1px solid rgba(242, 237, 228, 0.2);
-      border-radius: 3px;
-      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(242, 237, 228, 0.18);
+      padding: 0.8rem 0;
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       font-size: 1rem;
       color: var(--cream);
       outline: none;
-      transition: background 0.3s ease;
+      transition: border-color 0.3s ease;
+      border-radius: 0;
       -webkit-appearance: none;
     }
 
     .form-group input:focus {
-      background: rgba(242, 237, 228, 0.1);
+      border-bottom-color: var(--gold-dim);
     }
 
     .form-group input::placeholder {
-      color: rgba(242, 237, 228, 0.25);
+      color: rgba(242, 237, 228, 0.22);
+      font-style: italic;
     }
 
-    .form-group input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.7) sepia(1) saturate(2) hue-rotate(5deg);
-      cursor: pointer;
-      opacity: 0.8;
+    /* ── DATE PICKER — Custom styled ── */
+    .date-display {
+      width: 300px;
+      margin-bottom: 1.5rem;
+      text-align: left;
     }
+
+    .date-display label {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+      opacity: 0.85;
+    }
+
+    .date-selects {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .date-selects select {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(242, 237, 228, 0.18);
+      padding: 0.8rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--cream);
+      outline: none;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .date-selects select:focus {
+      border-bottom-color: var(--gold-dim);
+    }
+
+    /* Style select options for dark bg */
+    .date-selects select option {
+      background: #2a2820;
+      color: var(--cream);
+    }
+
+    .date-selects select.placeholder-shown {
+      color: rgba(242, 237, 228, 0.22);
+      font-style: italic;
+    }
+
+    .sel-month { flex: 2; }
+    .sel-day   { flex: 1; }
+    .sel-year  { flex: 1.5; }
 
     .privacy-note {
-      font-size: 0.85rem;
-      color: rgba(242, 237, 228, 0.3);
+      font-size: 0.8rem;
+      color: rgba(242, 237, 228, 0.28);
       text-align: center;
-      line-height: 1.6;
+      line-height: 1.65;
+      max-width: 280px;
       margin-bottom: 0;
-      max-width: 300px;
     }
 
     /* ── CONFIRMATION ── */
     #s5 .arrival-date {
-      margin-top: 2rem;
-      font-size: 1rem;
+      margin-top: 1.75rem;
+      font-size: 0.95rem;
       letter-spacing: 0.04em;
       color: var(--gold);
+      opacity: 0.85;
+      line-height: 1.7;
     }
 
-    /* ── TIME CAPSULE SVG ── */
-    .capsule-wrap {
-      margin-bottom: 2rem;
+    /* ── DIVIDER LINE ── */
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold-dim);
+      margin: 1.75rem auto;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      .headline { font-size: clamp(1.75rem, 7vw, 2.5rem); }
+      .body-copy { font-size: 0.97rem; line-height: 1.85; }
+      .btn { padding: 0.85rem 2.25rem; bottom: 5rem; }
+      .dots { bottom: 2.25rem; }
+      .wordmark { top: 1.5rem; }
+      .form-group, .date-display { width: 100%; max-width: 300px; }
     }
   </style>
 </head>
 <body>
 
-<!-- Wordmark fixed on all screens -->
-<p class="wordmark">Threshold</p>
+<p class="wordmark" id="fixed-wordmark">Threshold</p>
 
 <div id="app">
 
@@ -307,54 +374,68 @@
     <div class="inner">
       <p class="wordmark-inline">Threshold</p>
       <div class="rule"></div>
-      <h1 class="headline" style="max-width: 860px;">Who you've been<br/>deserves a proper goodbye.</h1>
-      <p class="subtext">For the ones who are retiring — this is that moment.</p>
-      <button class="btn" onclick="go(2)">I'm ready</button>
+      <h1 class="headline" style="max-width: 820px;">Who you've been<br/>deserves a proper goodbye.</h1>
+      <p class="subtext" style="margin-top: 0.5rem;">For the ones who are retiring — this is that moment.</p>
     </div>
+    <button class="btn" onclick="go(2)">I'm ready</button>
   </section>
 
   <!-- SCREEN 2 — THE PITCH -->
   <section class="screen" id="s2">
     <div class="inner">
       <p class="body-copy">
-        Retirement is one of the most significant moments of your life. For a long time, you were a version of yourself — and now that chapter is closing.<br/><br/>
-        Some people step into what's next with clarity. Others find themselves unmoored. Most feel both.<br/><br/>
+        Retirement is one of the most significant moments of your life. For a long time, you were a version of yourself — and now that chapter is closing.
+      </p>
+      <div class="divider"></div>
+      <p class="body-copy">
+        Some people step into what's next with clarity. Others find themselves unmoored. Most feel both.
+      </p>
+      <div class="divider"></div>
+      <p class="body-copy">
         <em>Threshold is a mirror.</em> A private space to speak honestly about who you've been, what you're carrying, and what you're hoping&nbsp;for.
       </p>
-      <button class="btn" onclick="go(3)">Continue</button>
     </div>
+    <button class="btn" onclick="go(3)">Continue</button>
   </section>
 
   <!-- SCREEN 3 — THE MECHANICS -->
   <section class="screen" id="s3">
-    <div class="inner" style="padding-bottom: 3rem;">
+    <div class="inner" style="padding-bottom: 1rem;">
       <div class="capsule-wrap">
-        <svg width="120" height="110" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="An open time capsule with letters inside">
-          <rect x="12" y="48" width="96" height="58" rx="3" fill="#2A2820" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5"/>
-          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.6"/>
-          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.35" transform="rotate(-8 28 40)"/>
-          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" transform="rotate(2 42 38)"/>
-          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.7" transform="rotate(-3 50 42)"/>
-          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" fill="none" transform="rotate(-3 50 42)"/>
-          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5" transform="rotate(-22 60 54)"/>
-          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.4" transform="rotate(-22 60 54)"/>
-          <line x1="22" y1="30" x2="98" y2="30" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.25" transform="rotate(-22 60 54)"/>
+        <!-- Time capsule SVG — refined version -->
+        <svg width="108" height="100" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="An open time capsule with letters inside">
+          <!-- Box body -->
+          <rect x="12" y="48" width="96" height="58" rx="3" fill="#242220" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.45"/>
+          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.55"/>
+          <!-- Letters fanned inside -->
+          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.3" transform="rotate(-8 28 40)"/>
+          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.45" transform="rotate(2 42 38)"/>
+          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.65" transform="rotate(-3 50 42)"/>
+          <!-- Envelope V on front letter -->
+          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.45" fill="none" transform="rotate(-3 50 42)"/>
+          <!-- Lid -->
+          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.45" transform="rotate(-22 60 54)"/>
+          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.35" transform="rotate(-22 60 54)"/>
         </svg>
       </div>
       <p class="body-copy">
-        Over the coming year, Threshold will send you three letters — one before you leave, one when you're finding your footing, and one when you've begun to arrive. Your honest answers will be sealed inside your time capsule.<br/><br/>
-        A year from now, it opens. You'll receive everything you wrote — and meet who you were standing at the threshold. Threshold will be there too, reflecting back how far you've&nbsp;come.<br/><br/>
-        <em>Nobody else will ever read them. This is just for you.</em>
+        Over the coming year, Threshold will send you three letters — one before you leave, one when you're finding your footing, and one when you've begun to arrive.
       </p>
-      <button class="btn" onclick="go(4)">Continue</button>
+      <div class="divider"></div>
+      <p class="body-copy">
+        Your honest answers will be sealed inside your time capsule. A year from now, it opens — and you'll meet who you were standing at the threshold.
+      </p>
+      <div class="divider"></div>
+      <p class="body-copy"><em>Nobody else will ever read them. This is just for you.</em></p>
     </div>
+    <button class="btn" onclick="go(4)">Continue</button>
   </section>
 
   <!-- SCREEN 4 — DETAILS FORM -->
   <section class="screen" id="s4">
-    <div class="inner" style="max-width: 600px; text-align: center;">
+    <div class="inner" style="max-width: 440px;">
       <p class="label">Tell us about yourself</p>
-      <h2 class="headline" style="font-size: clamp(2rem, 5vw, 3rem); margin-bottom: 2rem;">Where should your<br/>first letter arrive?</h2>
+      <h2 class="headline" style="font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 2.25rem;">Where should your<br/>first letter arrive?</h2>
 
       <div class="form-group">
         <label for="fname">First name</label>
@@ -363,15 +444,38 @@
 
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" placeholder="This is where your letters arrive" autocomplete="email" />
+        <input type="email" id="email" placeholder="Where your letters will arrive" autocomplete="email" />
       </div>
 
-      <div class="form-group">
-        <label for="retdate">Retirement date</label>
-        <input type="date" id="retdate" />
+      <!-- Custom date — three dropdowns, no calendar widget -->
+      <div class="date-display">
+        <label>Retirement date</label>
+        <div class="date-selects">
+          <select id="ret-month" class="sel-month placeholder-shown" onchange="this.classList.remove('placeholder-shown')">
+            <option value="" disabled selected>Month</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          <select id="ret-day" class="sel-day placeholder-shown" onchange="this.classList.remove('placeholder-shown')">
+            <option value="" disabled selected>Day</option>
+          </select>
+          <select id="ret-year" class="sel-year placeholder-shown" onchange="this.classList.remove('placeholder-shown')">
+            <option value="" disabled selected>Year</option>
+          </select>
+        </div>
       </div>
 
-      <p class="privacy-note" style="margin-bottom: 2rem;">Your letters are private. We will never share your information or your words with anyone.</p>
+      <p class="privacy-note" style="margin-bottom: 2rem;">Your letters are private. We will never share your information or your words with&nbsp;anyone.</p>
 
       <button class="btn" onclick="handleSignup()">Open my time capsule</button>
     </div>
@@ -381,25 +485,21 @@
   <section class="screen" id="s5">
     <div class="inner">
       <div class="capsule-wrap">
-        <svg width="100" height="92" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect x="12" y="48" width="96" height="58" rx="3" fill="#2A2820" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5"/>
-          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.6"/>
-          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.35" transform="rotate(-8 28 40)"/>
-          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" transform="rotate(2 42 38)"/>
-          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.7" transform="rotate(-3 50 42)"/>
-          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.5" fill="none" transform="rotate(-3 50 42)"/>
-          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.5" transform="rotate(-22 60 54)"/>
-          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.4" transform="rotate(-22 60 54)"/>
-          <line x1="22" y1="30" x2="98" y2="30" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.25" transform="rotate(-22 60 54)"/>
+        <svg width="88" height="82" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="12" y="48" width="96" height="58" rx="3" fill="#242220" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.45"/>
+          <rect x="18" y="54" width="84" height="46" rx="2" fill="#1C1C1A" opacity="0.55"/>
+          <rect x="28" y="40" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.3" transform="rotate(-8 28 40)"/>
+          <rect x="42" y="38" width="38" height="30" rx="2" fill="#2E2C24" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.45" transform="rotate(2 42 38)"/>
+          <rect x="50" y="42" width="38" height="30" rx="2" fill="#302E26" stroke="#C9A96E" stroke-width="0.6" stroke-opacity="0.65" transform="rotate(-3 50 42)"/>
+          <path d="M51 44 L69 56 L87 44" stroke="#C9A96E" stroke-width="0.5" stroke-opacity="0.45" fill="none" transform="rotate(-3 50 42)"/>
+          <rect x="10" y="10" width="100" height="44" rx="3" fill="#252318" stroke="#C9A96E" stroke-width="0.75" stroke-opacity="0.45" transform="rotate(-22 60 54)"/>
+          <rect x="16" y="14" width="88" height="36" rx="2" fill="#1C1C1A" opacity="0.35" transform="rotate(-22 60 54)"/>
         </svg>
       </div>
-      <h2 class="headline" id="confirm-headline" style="font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 1.25rem;">Welcome.</h2>
-      <p class="body-copy" style="margin-bottom: 0; font-size: 1.1rem;">
-        Your time capsule is open.
-      </p>
-      <p class="body-copy" style="margin-top: 1.5rem; margin-bottom: 0; font-size: 1.1rem;">
-        Over the coming year, three letters will find you — each carrying questions to answer honestly. Your words will be sealed inside.
-      </p>
+      <h2 class="headline" id="confirm-headline" style="font-size: clamp(1.75rem, 4vw, 2.75rem); margin-bottom: 1rem;">Welcome.</h2>
+      <p class="body-copy">Your time capsule is open.</p>
+      <div class="divider"></div>
+      <p class="body-copy">Three letters will find you over the coming year — each carrying questions to answer honestly. Your words will be sealed inside.</p>
       <p class="arrival-date" id="arrival-date-text"></p>
     </div>
   </section>
@@ -407,7 +507,7 @@
 </div>
 
 <!-- PROGRESS DOTS -->
-<div class="dots">
+<div class="dots" id="dots">
   <div class="dot active"></div>
   <div class="dot"></div>
   <div class="dot"></div>
@@ -418,13 +518,49 @@
 <script>
   let current = 1;
 
+  // Populate day dropdown
+  function populateDays(month, year) {
+    const dayEl = document.getElementById('ret-day');
+    const selected = dayEl.value;
+    const days = new Date(year || 2025, month || 12, 0).getDate();
+    dayEl.innerHTML = '<option value="" disabled selected>Day</option>';
+    for (let d = 1; d <= days; d++) {
+      const o = document.createElement('option');
+      o.value = String(d).padStart(2, '0');
+      o.textContent = d;
+      dayEl.appendChild(o);
+    }
+    if (selected) dayEl.value = selected;
+  }
+
+  // Populate year dropdown (current year + 10)
+  function populateYears() {
+    const yearEl = document.getElementById('ret-year');
+    const now = new Date().getFullYear();
+    for (let y = now; y <= now + 10; y++) {
+      const o = document.createElement('option');
+      o.value = y;
+      o.textContent = y;
+      yearEl.appendChild(o);
+    }
+  }
+
+  document.getElementById('ret-month').addEventListener('change', function() {
+    populateDays(this.value, document.getElementById('ret-year').value);
+  });
+  document.getElementById('ret-year').addEventListener('change', function() {
+    populateDays(document.getElementById('ret-month').value, this.value);
+  });
+
+  populateDays();
+  populateYears();
+
   function go(n) {
     document.getElementById('s' + current).classList.remove('active');
     document.getElementById('s' + n).classList.add('active');
     current = n;
     updateDots();
-    // Show fixed wordmark on all screens except screen 1
-    document.querySelector('.wordmark').classList.toggle('visible', n > 1);
+    document.getElementById('fixed-wordmark').classList.toggle('visible', n > 1);
   }
 
   function updateDots() {
@@ -434,16 +570,18 @@
   }
 
   function handleSignup() {
-    const fname = document.getElementById('fname').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const retdate = document.getElementById('retdate').value;
+    const fname  = document.getElementById('fname').value.trim();
+    const email  = document.getElementById('email').value.trim();
+    const month  = document.getElementById('ret-month').value;
+    const day    = document.getElementById('ret-day').value;
+    const year   = document.getElementById('ret-year').value;
 
-    if (!fname || !email || !retdate) {
+    if (!fname || !email || !month || !day || !year) {
       alert('Please fill in all fields.');
       return;
     }
 
-    const ret = new Date(retdate + 'T12:00:00');
+    const ret = new Date(`${year}-${month}-${day}T12:00:00`);
     const firstLetter = new Date(ret);
     firstLetter.setDate(firstLetter.getDate() - 14);
 
