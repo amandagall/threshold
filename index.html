@@ -58,7 +58,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      /* top: wordmark ~4rem, bottom: button 5.5rem + dots 3rem = ~8.5rem safe zone */
+      padding: 5rem 2rem 9rem;
       opacity: 0;
       pointer-events: none;
       transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -209,6 +210,7 @@
     }
 
     /* ── SCREEN 1 ── */
+    #s1 { justify-content: flex-start; padding-top: 22vh; }
     #s1 .inner { max-width: 860px; }
 
     #s1 .rule {
@@ -354,12 +356,16 @@
 
     /* ── MOBILE ── */
     @media (max-width: 480px) {
+      .screen { padding: 4.5rem 1.5rem 8.5rem; }
+      #s1 { padding-top: 18vh; }
       .headline { font-size: clamp(1.75rem, 7vw, 2.5rem); }
       .body-copy { font-size: 0.97rem; line-height: 1.85; }
-      .btn { padding: 0.85rem 2.25rem; bottom: 5rem; }
-      .dots { bottom: 2.25rem; }
-      .wordmark { top: 1.5rem; }
+      .divider { margin: 1.25rem auto; }
+      .btn { padding: 0.85rem 2.25rem; bottom: 4.5rem; }
+      .dots { bottom: 2rem; }
+      .wordmark { top: 1.25rem; }
       .form-group, .date-display { width: 100%; max-width: 300px; }
+      .capsule-wrap { margin-bottom: 1.25rem; }
     }
   </style>
 </head>
