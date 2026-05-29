@@ -584,29 +584,51 @@
     });
   }
 
-  function handleSignup() {
-    const fname  = document.getElementById('fname').value.trim();
-    const email  = document.getElementById('email').value.trim();
-    const month  = document.getElementById('ret-month').value;
-    const day    = document.getElementById('ret-day').value;
-    const year   = document.getElementById('ret-year').value;
+  async function handleSignup() {
+    const fname = document.getElementById('fname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const month = document.getElementById('ret-month').value;
+    const day = document.getElementById('ret-day').value;
+    const year = document.getElementById('ret-year').value;
 
     if (!fname || !email || !month || !day || !year) {
       alert('Please fill in all fields.');
       return;
     }
 
-    const ret = new Date(`${year}-${month}-${day}T12:00:00`);
+    // Format date as YYYY-MM-DD for Supabase
+    const retdate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+    // Save to Supabase
+    const SUPABASE_URL = 'https://fvdsizuvdaanstgvhkmt.supabase.co';
+    const SUPABASE_KEY = 'YOUR_PUBLISHABLE_KEY_HERE';
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/signups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      },
+      body: JSON.stringify({ name: fname, email: email, retirement_date: retdate })
+    });
+
+    if (!response.ok) {
+      alert('Something went wrong. Please try again.');
+      return;
+    }
+
+    // Move to confirmation screen
+    const ret = new Date(`${retdate}T12:00:00`);
     const firstLetter = new Date(ret);
     firstLetter.setDate(firstLetter.getDate() - 14);
-
     const formatted = firstLetter.toLocaleDateString('en-US', {
       month: 'long', day: 'numeric', year: 'numeric'
     });
 
     document.getElementById('confirm-headline').textContent = 'Welcome, ' + fname + '.';
-    document.getElementById('arrival-date-text').innerHTML =
-      'Your first letter arrives on ' + formatted + '.<br/>Watch your inbox.';
+    document.getElementById('arrival-date-text').textContent =
+      'Your first letter arrives on ' + formatted + '. Watch your inbox.';
 
     go(5);
   }
