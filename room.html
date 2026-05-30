@@ -56,20 +56,11 @@
     }
 
     .body-copy {
-  font-size: 1rem;
-  line-height: 1.9;
-  color: var(--text-muted);
-  max-width: 420px;
-  margin-bottom: 1rem;
-  text-wrap: balance;
-}
-
-    .arrival {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      color: var(--gold);
-      opacity: 0.85;
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      max-width: 420px;
+      margin-bottom: 1rem;
       text-wrap: balance;
     }
 
@@ -85,13 +76,77 @@
       font-size: 0.9rem;
       letter-spacing: 0.08em;
     }
+
+    .timeline {
+      margin-top: 3rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: left;
+    }
+
+    .letter {
+      padding: 1.5rem;
+      border: 1px solid var(--gold-dim);
+    }
+
+    .letter-active {
+      border-color: rgba(201, 169, 110, 0.5);
+      background: rgba(201, 169, 110, 0.04);
+    }
+
+    .letter-dim {
+      opacity: 0.45;
+    }
+
+    .letter-connector {
+      width: 1px;
+      height: 2rem;
+      background: var(--gold-dim);
+      margin-left: 1.5rem;
+    }
+
+    .letter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.75rem;
+    }
+
+    .letter-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.85;
+    }
+
+    .letter-name {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--cream);
+    }
+
+    .letter-desc {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      text-wrap: balance;
+    }
+
+    .letter-date {
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      opacity: 0.75;
+    }
   </style>
 </head>
 <body>
 
 <div class="room">
   <p class="wordmark">Threshold</p>
-
   <div id="content">
     <p class="loading">Opening your capsule...</p>
   </div>
@@ -126,11 +181,19 @@
 
     const user = data[0];
     const retDate = new Date(`${user.retirement_date}T12:00:00`);
-    const firstLetter = new Date(retDate);
-    firstLetter.setDate(firstLetter.getDate() - 14);
-    const formatted = firstLetter.toLocaleDateString('en-US', {
-      month: 'long', day: 'numeric', year: 'numeric'
-    });
+
+    const letterOne = new Date(retDate);
+    letterOne.setDate(letterOne.getDate() - 14);
+
+    const letterTwo = new Date(retDate);
+    letterTwo.setMonth(letterTwo.getMonth() + 3);
+
+    const letterThree = new Date(retDate);
+    letterThree.setFullYear(letterThree.getFullYear() + 1);
+
+    function formatDate(d) {
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
 
     document.getElementById('content').innerHTML = `
       <svg width="90" height="112" viewBox="-10 -16 100 172" role="img" xmlns="http://www.w3.org/2000/svg">
@@ -150,11 +213,46 @@
         <line x1="25" y1="73" x2="33" y2="64" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round"/>
         <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
       </svg>
+
       <div class="divider"></div>
+
       <h1 class="headline">Welcome, ${user.name.split(' ')[0]}.</h1>
-      <p class="body-copy">Your capsule is open. It's waiting to be filled.</p>
-      <p class="body-copy">Your first letter is on its way.</p>
-      <p class="arrival">It arrives on ${formatted}.</p>
+      <p class="body-copy">Three letters are making their way to you — each one arriving at a moment that matters. When a letter lands, you'll write inside it. Your words will be sealed away and tucked into your capsule.</p>
+
+      <div class="timeline">
+
+        <div class="letter letter-active">
+          <div class="letter-header">
+            <p class="letter-label">Letter One</p>
+            <p class="letter-name">Before</p>
+          </div>
+          <p class="letter-desc">Written at the edge of everything you've known. A chance to speak honestly about who you've been.</p>
+          <p class="letter-date">Arrives ${formatDate(letterOne)}</p>
+        </div>
+
+        <div class="letter-connector"></div>
+
+        <div class="letter letter-dim">
+          <div class="letter-header">
+            <p class="letter-label">Letter Two</p>
+            <p class="letter-name">After</p>
+          </div>
+          <p class="letter-desc">Arriving when the newness has worn off and the real questions begin to surface.</p>
+          <p class="letter-date">Arrives ${formatDate(letterTwo)}</p>
+        </div>
+
+        <div class="letter-connector"></div>
+
+        <div class="letter letter-dim">
+          <div class="letter-header">
+            <p class="letter-label">Letter Three</p>
+            <p class="letter-name">Beyond</p>
+          </div>
+          <p class="letter-desc">A year out. You'll know by then who you're becoming. This letter will want to know too.</p>
+          <p class="letter-date">Arrives ${formatDate(letterThree)}</p>
+        </div>
+
+      </div>
     `;
   }
 
