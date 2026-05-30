@@ -1,33 +1,73 @@
-const { Resend } = require('resend');
+html: `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0; padding:0; background-color:#1C1C1A;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1C1C1A;">
+  <tr>
+    <td align="center" style="padding:40px 20px;">
+      <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px; width:100%;">
+        
+        <!-- Wordmark -->
+        <tr>
+          <td align="center" style="padding-bottom:40px;">
+            <p style="margin:0; color:#C9A96E; font-family:Georgia,serif; font-size:12px; letter-spacing:4px; text-transform:uppercase;">Threshold</p>
+          </td>
+        </tr>
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+        <!-- Welcome -->
+        <tr>
+          <td style="padding-bottom:28px;">
+            <p style="margin:0; color:#F2EDE4; font-family:Georgia,serif; font-size:18px; line-height:1.8;">Welcome, ${name.split(' ')[0]}.</p>
+          </td>
+        </tr>
 
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+        <!-- Body copy -->
+        <tr>
+          <td style="padding-bottom:28px;">
+            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">There will be celebrations. Dinners, toasts, people who love you saying the right things.</p>
+          </td>
+        </tr>
 
-  const { name, email, token } = req.body;
+        <tr>
+          <td style="padding-bottom:28px;">
+            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">Threshold is for the quieter question underneath all of it — <em>who are you, now that this chapter is closing?</em></p>
+          </td>
+        </tr>
 
-  const { data, error } = await resend.emails.send({
-    from: 'Threshold <hello@atthreshold.ca>',
-    to: email,
-    subject: 'Your time capsule is open.',
-    html: `
-<p style="color:#C9A96E; font-size:0.75rem; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:3rem; text-align:center;">Threshold</p>
-<p style="font-size:1.1rem; line-height:1.8; color:#F2EDE4; margin-bottom:1.75rem;">Welcome, ${name.split(' ')[0]}.</p>    <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">There will be celebrations. Dinners, toasts, people who love you saying the right things.</p>
-    <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">Threshold is for the quieter question underneath all of it — <em>who are you, now that this chapter is closing?</em></p>
-    <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">Over the coming year, we'll find you at the moments that matter. Letters will arrive when the time is right, carrying questions worth sitting with honestly. Your answers will be sealed inside your capsule — private, and entirely yours.</p>
-    <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:2.5rem;">For now, your capsule is open and waiting.</p>
-    <a href="https://atthreshold.ca/room?token=${token}" style="display:inline-block; color:#C9A96E; font-family:'DM Sans',sans-serif; font-size:0.75rem; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none; border:1px solid rgba(201,169,110,0.28); padding:0.9rem 2.5rem;">Enter Threshold →</a>
-    <p style="margin-top:3.5rem; color:rgba(242,237,228,0.3); font-size:0.8rem; font-style:italic;">— Threshold</p>
-  </div>
+        <tr>
+          <td style="padding-bottom:28px;">
+            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">Over the coming year, we'll find you at the moments that matter. Letters will arrive when the time is right, carrying questions worth sitting with honestly. Your answers will be sealed inside your capsule — private, and entirely yours.</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-bottom:40px;">
+            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">For now, your capsule is open and waiting.</p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding-bottom:56px;">
+            <a href="https://atthreshold.ca/room?token=${token}" style="display:inline-block; color:#C9A96E; font-family:Georgia,sans-serif; font-size:12px; letter-spacing:3px; text-transform:uppercase; text-decoration:none; border:1px solid rgba(201,169,110,0.4); padding:14px 40px;">Enter Threshold →</a>
+          </td>
+        </tr>
+
+        <!-- Sign off -->
+        <tr>
+          <td>
+            <p style="margin:0; color:rgba(242,237,228,0.3); font-family:Georgia,serif; font-size:13px; font-style:italic;">— Threshold</p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
 `
-  });
-
-  if (error) {
-    return res.status(500).json({ error });
-  }
-
-  return res.status(200).json({ data });
-};
