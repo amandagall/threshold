@@ -87,17 +87,19 @@
     }
 
     .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      border: 1px solid var(--gold-dim);
-      background: var(--card-bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border: 1px solid rgba(201, 169, 110, 0.5);
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.15), 0 4px 24px rgba(0,0,0,0.4);
+}
 
     .card-back {
       transform: rotateY(180deg);
