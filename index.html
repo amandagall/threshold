@@ -611,8 +611,11 @@
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`
       },
-      body: JSON.stringify({ name: fname, email: email, retirement_date: retdate, token: token })
-    });
+      const letterStartDate = new Date(`${retdate}T12:00:00`);
+letterStartDate.setDate(letterStartDate.getDate() - 14);
+const letterStart = letterStartDate.toISOString().split('T')[0];
+
+body: JSON.stringify({ name: fname, email: email, retirement_date: retdate, token: token, letter_start_date: letterStart, current_letter: 1, current_question: 0 }));
 
     if (!response.ok) {
       alert('Something went wrong. Please try again.');
