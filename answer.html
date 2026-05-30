@@ -72,6 +72,7 @@
       perspective: 800px;
       margin-bottom: 2.5rem;
       cursor: pointer;
+      border-radius: 8px;
     }
 
     .card {
@@ -286,21 +287,23 @@
     <p class="meta-letter" id="meta-letter">Letter One · Before</p>
     <p class="meta-question" id="meta-question">Question 1 of 4</p>
 
-    <div class="card-scene" id="card-scene" onclick="revealQuestion()">
+   <div class="card-scene" id="card-scene" onclick="revealQuestion()" style="border-radius:8px;">
       <div class="card" id="card">
         <!-- Front — blank card -->
-        <div class="card-face card-front">
+        <div class="card-face card-front" style="border-radius:8px; border:1px solid rgba(201,169,110,0.5); box-shadow:0 0 0 1px rgba(201,169,110,0.15), 0 4px 24px rgba(0,0,0,0.4);">
           <div class="card-corner"></div>
           <p class="card-front-label">Your question awaits</p>
-          <p class="card-front-cta">Reveal Question 1</p>
+          <p class="card-front-cta" id="reveal-cta">Reveal Question 1</p>
         </div>
         <!-- Back — question -->
-        <div class="card-face card-back">
+        <div class="card-face card-back" style="border-radius:8px; border:1px solid rgba(201,169,110,0.5); box-shadow:0 0 0 1px rgba(201,169,110,0.15), 0 4px 24px rgba(0,0,0,0.4);">
           <div class="card-corner"></div>
           <p class="card-question" id="card-question-text"></p>
         </div>
       </div>
     </div>
+
+    <p id="tap-prompt" style="font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(201,169,110,0.5); margin-bottom:1.5rem;">Tap to reveal</p>
 
     <div class="writing-area" id="writing-area">
       <p class="privacy-note">Take your time. There's no right answer — only an honest one.</p>
@@ -375,6 +378,7 @@
 
     document.getElementById('card').classList.add('flipped');
     document.getElementById('card-scene').style.cursor = 'default';
+    document.getElementById('tap-prompt').style.display = 'none';
 
     setTimeout(() => {
       document.getElementById('writing-area').classList.add('visible');
