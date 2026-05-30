@@ -36,22 +36,22 @@ module.exports = async function handler(req, res) {
         </tr>
         <tr>
           <td style="padding-bottom:28px;">
-            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">There will be celebrations. Dinners, toasts, people who love you saying the right things.</p>
+            <p style="margin:0; color:rgba(242,237,228,0.65); font-family:Georgia,serif; font-size:15px; line-height:1.9; font-weight:300;">There will be celebrations. Dinners, toasts, people who love you saying the right things.</p>
           </td>
         </tr>
         <tr>
           <td style="padding-bottom:28px;">
-            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">Threshold is for the quieter question underneath all of it — <em>who are you, now that this chapter is closing?</em></p>
+            <p style="margin:0; color:rgba(242,237,228,0.65); font-family:Georgia,serif; font-size:15px; line-height:1.9; font-weight:300;">Threshold is for the quieter question underneath all of it — <em>who are you, now that this chapter is closing?</em></p>
           </td>
         </tr>
         <tr>
           <td style="padding-bottom:28px;">
-            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">Over the coming year, we'll find you at the moments that matter. Letters will arrive when the time is right, carrying questions worth sitting with honestly. Your answers will be sealed inside your capsule — private, and entirely yours.</p>
+            <p style="margin:0; color:rgba(242,237,228,0.65); font-family:Georgia,serif; font-size:15px; line-height:1.9; font-weight:300;">Over the coming year, we'll find you at the moments that matter. Letters will arrive when the time is right, carrying questions worth sitting with honestly. Your answers will be sealed inside your capsule — private, and entirely yours.</p>
           </td>
         </tr>
         <tr>
           <td style="padding-bottom:40px;">
-            <p style="margin:0; color:rgba(242,237,228,0.75); font-family:Georgia,serif; font-size:16px; line-height:1.9;">For now, your capsule is open and waiting.</p>
+            <p style="margin:0; color:rgba(242,237,228,0.65); font-family:Georgia,serif; font-size:15px; line-height:1.9; font-weight:300;">For now, your capsule is open and waiting.</p>
           </td>
         </tr>
         <tr>
