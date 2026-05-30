@@ -642,8 +642,7 @@ const ret = new Date(`${retdate}T12:00:00`);
       month: 'long', day: 'numeric', year: 'numeric'
     });
 
-    document.getElementById('confirm-headline').textContent = 'Welcome, ' + fname + '.';
-    document.getElementById('arrival-date-text').textContent =
+document.getElementById('confirm-headline').textContent = 'Welcome, ' + fname.split(' ')[0] + '.';    document.getElementById('arrival-date-text').textContent =
       'Your first letter arrives on ' + formatted + '. Watch your inbox.';
 
     go(5);
