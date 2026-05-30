@@ -14,7 +14,7 @@ module.exports = async function handler(req, res) {
     to: email,
     subject: 'Your time capsule is open.',
     html: `
-<div style="background:#1C1C1A; color:#F2EDE4; font-family:Georgia,serif; max-width:520px; margin:0 auto; padding:4rem 2.5rem; text-align:center;">    <p style="color:#C9A96E; font-size:0.75rem; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:3rem;">Threshold</p>
+<p style="color:#C9A96E; font-size:0.75rem; letter-spacing:0.22em; text-transform:uppercase; margin-bottom:3rem; text-align:center;">Threshold</p>
 <p style="font-size:1.1rem; line-height:1.8; color:#F2EDE4; margin-bottom:1.75rem;">Welcome, ${name.split(' ')[0]}.</p>    <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">There will be celebrations. Dinners, toasts, people who love you saying the right things.</p>
     <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">Threshold is for the quieter question underneath all of it — <em>who are you, now that this chapter is closing?</em></p>
     <p style="font-size:1rem; line-height:1.9; color:rgba(242,237,228,0.75); margin-bottom:1.75rem;">Over the coming year, we'll find you at the moments that matter. Letters will arrive when the time is right, carrying questions worth sitting with honestly. Your answers will be sealed inside your capsule — private, and entirely yours.</p>
