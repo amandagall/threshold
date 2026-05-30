@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threshold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1C1C1A;
+      --gold: #C9A96E;
+      --gold-dim: rgba(201, 169, 110, 0.28);
+      --cream: #F2EDE4;
+      --text-muted: rgba(242, 237, 228, 0.42);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 3rem;
+      display: block;
+    }
+
+    .meta {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.75;
+      margin-bottom: 2rem;
+    }
+
+    .question {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+      line-height: 1.3;
+      color: var(--cream);
+      margin-bottom: 2.5rem;
+      text-wrap: balance;
+    }
+
+    .privacy-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .answer-box {
+      width: 100%;
+      min-height: 240px;
+      background: rgba(242, 237, 228, 0.04);
+      border: 1px solid var(--gold-dim);
+      padding: 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--cream);
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .answer-box:focus {
+      border-color: rgba(201, 169, 110, 0.5);
+    }
+
+    .answer-box::placeholder {
+      color: rgba(242, 237, 228, 0.2);
+      font-style: italic;
+    }
+
+    .seal-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .seal-note em {
+      color: rgba(242, 237, 228, 0.6);
+      font-style: normal;
+    }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: none;
+      border: 1px solid var(--gold-dim);
+      padding: 0.9rem 2.75rem;
+      cursor: pointer;
+      transition: border-color 0.4s ease, background 0.4s ease;
+      display: block;
+      width: fit-content;
+    }
+
+    .btn:hover {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.07);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold-dim);
+      margin: 2.5rem 0;
+    }
+
+    /* ── ENVELOPE ANIMATION ── */
+    .envelope-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .envelope-wrap.visible {
+      display: flex;
+    }
+
+    .envelope-message {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.5rem;
+      color: var(--cream);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .envelope-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 340px;
+      text-wrap: balance;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gold-dim);
+      padding-bottom: 0.2rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .back-link:hover {
+      border-color: var(--gold);
+    }
+
+    /* ── PAPER FOLD ANIMATION ── */
+    @keyframes paperFold {
+      0% { transform: translateY(0) scaleY(1); opacity: 1; }
+      40% { transform: translateY(10px) scaleY(0.6); opacity: 0.8; }
+      100% { transform: translateY(60px) scaleY(0.1); opacity: 0; }
+    }
+
+    @keyframes fadeInMessage {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .paper-animating {
+      animation: paperFold 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .message-fadein {
+      animation: fadeInMessage 0.8s ease forwards;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <span class="wordmark">Threshold</span>
+
+  <div id="writing-view">
+    <p class="meta" id="meta-label">Letter One · Before · Question 1 of 4</p>
+
+    <h1 class="question" id="question-text">Loading your question...</h1>
+
+    <div class="divider"></div>
+
+    <p class="privacy-note">Take your time. There's no right answer — only an honest one.</p>
+
+    <textarea
+      class="answer-box"
+      id="answer-input"
+      placeholder="Begin writing here..."
+    ></textarea>
+
+    <p class="seal-note">Once you submit, <em>your answer will be folded and sealed.</em> It cannot be edited.</p>
+
+    <button class="btn" id="submit-btn" onclick="submitAnswer()">Seal this answer</button>
+  </div>
+
+  <div class="envelope-wrap" id="envelope-view">
+    <svg width="120" height="90" viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg">
+      <!-- Envelope body -->
+      <rect x="2" y="20" width="116" height="68" fill="#242220" stroke="#C9A96E" stroke-width="1.5"/>
+      <!-- Envelope flap open -->
+      <path d="M2 20 L60 8 L118 20" fill="#1e1c18" stroke="#C9A96E" stroke-width="1.5"/>
+      <!-- Folded paper inside -->
+      <rect x="30" y="35" width="60" height="40" fill="#2a2820" stroke="#C9A96E" stroke-width="1" opacity="0.9"/>
+      <line x1="30" y1="47" x2="90" y2="47" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
+      <line x1="30" y1="55" x2="90" y2="55" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
+      <line x1="30" y1="63" x2="75" y2="63" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+
+    <p class="envelope-message" id="envelope-message">Sealed.</p>
+    <p class="envelope-sub" id="envelope-sub">Your answer has been folded and placed in your envelope. The next question arrives in a few days.</p>
+    <a class="back-link" id="back-link" href="#">Return to your room</a>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://fvdsizuvdaanstgvhkmt.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2ZHNpenV2ZGFhbnN0Z3Zoa210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODExMjIsImV4cCI6MjA5NTY1NzEyMn0.xQOHZVbndtkkP8VwZeTIQvT7Pu2RFeLCTGYaNzdYQcI';
+
+  const questions = [
+    'What part of yourself do you leave in the car every morning before you walk in?',
+    'What would quietly fall apart without you?',
+    'Who at work will you actually miss — and does that surprise you?',
+    'What are you quietly sad about that you haven\'t fully admitted yet?'
+  ];
+
+  let currentUser = null;
+  let currentQuestion = 0;
+  let token = null;
+
+  async function loadQuestion() {
+    const params = new URLSearchParams(window.location.search);
+    token = params.get('token');
+
+    if (!token) {
+      document.getElementById('question-text').textContent = 'No token found. Please use the link from your email.';
+      return;
+    }
+
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}&select=*`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!data || data.length === 0) {
+      document.getElementById('question-text').textContent = 'We couldn\'t find your record. Please use the link from your email.';
+      return;
+    }
+
+    currentUser = data[0];
+    currentQuestion = currentUser.current_question - 1;
+
+    if (currentQuestion < 0 || currentQuestion >= questions.length) {
+      document.getElementById('question-text').textContent = 'No question is ready for you right now.';
+      return;
+    }
+
+    document.getElementById('question-text').textContent = questions[currentQuestion];
+    document.getElementById('meta-label').textContent = `Letter One · Before · Question ${currentQuestion + 1} of 4`;
+    document.getElementById('back-link').href = `/room?token=${token}`;
+  }
+
+  async function submitAnswer() {
+    const answer = document.getElementById('answer-input').value.trim();
+
+    if (!answer) {
+      alert('Please write something before sealing.');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sealing...';
+
+    // Animate the writing view out
+    const writingView = document.getElementById('writing-view');
+    writingView.classList.add('paper-animating');
+
+    // Save answer to Supabase
+    const answerField = `answer_${currentQuestion + 1}`;
+    await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ [answerField]: answer })
+    });
+
+    // After animation show envelope
+    setTimeout(() => {
+      writingView.style.display = 'none';
+      const envelopeView = document.getElementById('envelope-view');
+      envelopeView.classList.add('visible', 'message-fadein');
+
+      if (currentQuestion === 3) {
+        document.getElementById('envelope-message').textContent = 'Your envelope is sealed.';
+        document.getElementById('envelope-sub').textContent = 'All four answers are inside. Your envelope has been folded shut and placed in your capsule.';
+      }
+    }, 950);
+  }
+
+  loadQuestion();
+</script>
+
+</body>
+</html>
