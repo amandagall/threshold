@@ -1,5 +1,11 @@
 {
   "rewrites": [
     { "source": "/room", "destination": "/room.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron-send-questions",
+      "schedule": "0 9 * * *"
+    }
   ]
 }
