@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   const { name, email, token } = req.body;
 
   const { data, error } = await resend.emails.send({
-    from: 'hello@atthreshold.ca',,
+    from: 'hello@atthreshold.ca',
     to: email,
     subject: 'Your time capsule is open.',
     html: `
