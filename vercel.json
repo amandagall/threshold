@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/room", "destination": "/room.html" }
+    { "source": "/room", "destination": "/room.html" },
+    { "source": "/answer", "destination": "/answer.html" }
   ],
   "crons": [
     {
