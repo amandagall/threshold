@@ -618,8 +618,15 @@
       return;
     }
 
-    // Move to confirmation screen
-    const ret = new Date(`${retdate}T12:00:00`);
+    // Send welcome email
+await fetch('/api/send-welcome', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: fname, email: email })
+});
+
+// Move to confirmation screen
+const ret = new Date(`${retdate}T12:00:00`);
     const firstLetter = new Date(ret);
     firstLetter.setDate(firstLetter.getDate() - 14);
     const formatted = firstLetter.toLocaleDateString('en-US', {
