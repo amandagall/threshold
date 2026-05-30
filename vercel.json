@@ -8,10 +8,5 @@
       "path": "/api/cron-send-questions",
       "schedule": "0 9 * * *"
     }
-  ],
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  ]
 }
