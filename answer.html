@@ -67,13 +67,14 @@
 
     /* ── CARD FLIP ── */
     .card-scene {
-      width: 320px;
-      height: 200px;
-      perspective: 800px;
-      margin-bottom: 2.5rem;
-      cursor: pointer;
-      border-radius: 8px;
-    }
+  width: 320px;
+  height: 200px;
+  perspective: 800px;
+  margin-bottom: 2.5rem;
+  cursor: pointer;
+  border-radius: 8px;
+  position: relative;
+}
 
     .card {
       width: 100%;
@@ -141,6 +142,21 @@
       color: var(--cream);
       text-wrap: balance;
     }
+    .tap-hint {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 1.4rem;
+  animation: pulse-finger 1.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+  user-select: none;
+}
+
+@keyframes pulse-finger {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.85); }
+}
 
     /* ── WRITING AREA ── */
     .writing-area {
@@ -288,7 +304,8 @@
     <p class="meta-question" id="meta-question">Question 1 of 4</p>
 
    <div class="card-scene" id="card-scene" onclick="revealQuestion()" style="border-radius:8px;">
-      <div class="card" id="card">
+    <div class="tap-hint" id="tap-hint">👆</div>  
+    <div class="card" id="card">
         <!-- Front — blank card -->
         <div class="card-face card-front" style="border-radius:8px; border:1px solid rgba(201,169,110,0.5); box-shadow:0 0 0 1px rgba(201,169,110,0.15), 0 4px 24px rgba(0,0,0,0.4);">
           <div class="card-corner"></div>
@@ -303,7 +320,6 @@
       </div>
     </div>
 
-    <p id="tap-prompt" style="font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(201,169,110,0.5); margin-bottom:1.5rem;">Tap to reveal</p>
 
     <div class="writing-area" id="writing-area">
       <p class="privacy-note">Take your time. There's no right answer — only an honest one.</p>
@@ -379,6 +395,7 @@
     document.getElementById('card').classList.add('flipped');
     document.getElementById('card-scene').style.cursor = 'default';
     document.getElementById('tap-prompt').style.display = 'none';
+    document.getElementById('tap-hint').style.display = 'none';
 
     setTimeout(() => {
       document.getElementById('writing-area').classList.add('visible');
