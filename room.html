@@ -142,7 +142,6 @@
       opacity: 0.75;
     }
 
-    /* Progress dots */
     .progress {
       display: flex;
       align-items: center;
@@ -172,7 +171,6 @@
       border-color: var(--gold);
     }
 
-    /* Answer CTA */
     .answer-cta {
       display: inline-block;
       margin-top: 1.25rem;
@@ -253,54 +251,45 @@
       return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     }
 
-    // Question progress state
+    // Count answered questions by checking which answer fields have content
     const currentQuestion = user.current_question || 0;
-    const questionsAnswered = currentQuestion - 1; // current_question increments after sending, so answered = current - 1
-    const answeredCount = Math.max(0, questionsAnswered);
+    const answeredCount = Math.min(4, ['answer_1','answer_2','answer_3','answer_4'].filter(k => user[k]).length);
     const allAnswered = answeredCount >= 4;
-    const hasStarted = currentQuestion > 0;
+    const questionWaiting = currentQuestion > answeredCount && !allAnswered;
 
-// Question progress state
-const currentQuestion = user.current_question || 0;
-const answeredCount = Math.min(4, Object.keys(user).filter(k => k.startsWith('answer_') && user[k]).length);
-const allAnswered = answeredCount >= 4;
-const questionWaiting = currentQuestion > answeredCount && !allAnswered;
+    function buildDots(answered) {
+      let dots = '';
+      for (let i = 0; i < 4; i++) {
+        dots += `<span class="dot ${i < answered ? 'dot-filled' : ''}"></span>`;
+      }
+      return dots;
+    }
 
-// Build progress dots (4 total)
-function buildDots(answered) {
-  let dots = '';
-  for (let i = 0; i < 4; i++) {
-    dots += `<span class="dot ${i < answered ? 'dot-filled' : ''}"></span>`;
-  }
-  return dots;
-}
-
-// Letter One progress block
-let letterOneProgress = '';
-if (allAnswered) {
-  letterOneProgress = `
-    <div class="progress">
-      <span class="progress-label">Progress</span>
-      ${buildDots(4)}
-    </div>
-    <p class="sealed-note">Your envelope is sealed.</p>
-  `;
-} else if (questionWaiting) {
-  letterOneProgress = `
-    <div class="progress">
-      <span class="progress-label">Progress</span>
-      ${buildDots(answeredCount)}
-    </div>
-    <a class="answer-cta" href="/answer?token=${token}">A question is waiting →</a>
-  `;
-} else if (answeredCount > 0) {
-  letterOneProgress = `
-    <div class="progress">
-      <span class="progress-label">Progress</span>
-      ${buildDots(answeredCount)}
-    </div>
-  `;
-}    }
+    let letterOneProgress = '';
+    if (allAnswered) {
+      letterOneProgress = `
+        <div class="progress">
+          <span class="progress-label">Progress</span>
+          ${buildDots(4)}
+        </div>
+        <p class="sealed-note">Your envelope is sealed.</p>
+      `;
+    } else if (questionWaiting) {
+      letterOneProgress = `
+        <div class="progress">
+          <span class="progress-label">Progress</span>
+          ${buildDots(answeredCount)}
+        </div>
+        <a class="answer-cta" href="/answer?token=${token}">A question is waiting →</a>
+      `;
+    } else if (answeredCount > 0) {
+      letterOneProgress = `
+        <div class="progress">
+          <span class="progress-label">Progress</span>
+          ${buildDots(answeredCount)}
+        </div>
+      `;
+    }
 
     document.getElementById('content').innerHTML = `
       <svg width="90" height="112" viewBox="-10 -16 100 172" role="img" xmlns="http://www.w3.org/2000/svg">
