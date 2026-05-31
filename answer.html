@@ -292,6 +292,38 @@
     }
 
     .fadein { animation: fadeUp 0.7s ease forwards; }
+    /* ── WITNESS VIEW ── */
+.witness-view {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 0;
+  max-width: 460px;
+}
+
+.witness-view.visible {
+  display: flex;
+}
+
+.witness-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.6;
+  margin-bottom: 1.75rem;
+}
+
+.witness-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 1.2rem;
+  line-height: 1.75;
+  color: var(--cream);
+  opacity: 0.9;
+  text-wrap: balance;
+}
   </style>
 </head>
 <body>
@@ -328,7 +360,11 @@
       <button class="btn" id="submit-btn" onclick="submitAnswer()">Seal this answer</button>
     </div>
   </div>
-
+<div class="witness-view" id="witness-view">
+    <p class="witness-label">A reflection</p>
+    <p class="witness-text" id="witness-text"></p>
+    <button class="btn" id="seal-btn" onclick="sealAnswer()" style="margin-top: 2.5rem;">Seal this answer</button>
+  </div>
   <div class="sealed-view" id="sealed-view">
     <svg width="140" height="100" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="22" width="136" height="76" fill="#242220" stroke="#C9A96E" stroke-width="1.5"/>
@@ -403,35 +439,64 @@ setTimeout(() => {
       }, 600);
     }, 2000);
   }
-  async function submitAnswer() {
-    const answer = document.getElementById('answer-input').value.trim();
-    if (!answer) { alert('Please write something before sealing.'); return; }
+async function submitAnswer() {
+  const answer = document.getElementById('answer-input').value.trim();
+  if (!answer) { alert('Please write something before sealing.'); return; }
 
-    const btn = document.getElementById('submit-btn');
-    btn.disabled = true;
-    btn.textContent = 'Sealing...';
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sealing...';
 
-    const answerField = `answer_${currentQuestion + 1}`;
+  const answerField = `answer_${currentQuestion + 1}`;
+  const question = questions[currentQuestion];
 
-    await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({ [answerField]: answer })
+  // Save to Supabase
+  await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ [answerField]: answer })
+  });
+
+  // Call the witness API
+  let reflection = null;
+  try {
+    const witnessRes = await fetch('/api/witness', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, answer })
     });
-
-    document.getElementById('main-view').style.display = 'none';
-    const sealed = document.getElementById('sealed-view');
-    sealed.classList.add('visible', 'fadein');
-
-    if (currentQuestion === 3) {
-      document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
-    }
+    const witnessData = await witnessRes.json();
+    reflection = witnessData.reflection;
+  } catch (err) {
+    console.error('Witness error:', err);
   }
+
+  // Show witness view
+  document.getElementById('main-view').style.display = 'none';
+
+  if (reflection) {
+    const witnessView = document.getElementById('witness-view');
+    document.getElementById('witness-text').textContent = reflection;
+    witnessView.classList.add('visible', 'fadein');
+  } else {
+    sealAnswer();
+  }
+}
+
+function sealAnswer() {
+  document.getElementById('witness-view').style.display = 'none';
+  const sealed = document.getElementById('sealed-view');
+  sealed.classList.add('visible', 'fadein');
+
+  if (currentQuestion === 3) {
+    document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
+  }
+}  
 
   loadQuestion();
 </script>
