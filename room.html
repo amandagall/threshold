@@ -253,8 +253,7 @@
 
     // Count answered questions by checking which answer fields have content
     const currentQuestion = user.current_question || 0;
-const answeredCount = Math.min(4, ['answer_1','answer_2','answer_3','answer_4'].filter(k => user[k] !== null && user[k] !== undefined && user[k] !== '').length);    const allAnswered = answeredCount >= 4;
-    const questionWaiting = currentQuestion > answeredCount && !allAnswered;
+const answeredCount = Math.min(4, ['answer_1','answer_2','answer_3','answer_4'].filter(k => Boolean(user[k])).length);    const questionWaiting = currentQuestion > answeredCount && !allAnswered;
 console.log('debug', { currentQuestion, answeredCount, a1: user.answer_1, a2: user.answer_2 });
     function buildDots(answered) {
       let dots = '';
