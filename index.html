@@ -632,10 +632,6 @@ async function handleSignup() {
       alert('Something went wrong. Please try again.');
       return;
     } 
-    if (!response.ok) {
-      alert('Something went wrong. Please try again.');
-      return;
-    }
 
     // Send welcome email
 await fetch('/api/send-welcome', {
