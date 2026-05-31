@@ -141,6 +141,64 @@
       color: var(--gold);
       opacity: 0.75;
     }
+
+    /* Progress dots */
+    .progress {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1rem 0 1.25rem;
+    }
+
+    .progress-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.6;
+      margin-right: 0.25rem;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201, 169, 110, 0.4);
+    }
+
+    .dot-filled {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    /* Answer CTA */
+    .answer-cta {
+      display: inline-block;
+      margin-top: 1.25rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border: 1px solid var(--gold-dim);
+      padding: 0.75rem 1.75rem;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+
+    .answer-cta:hover {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.07);
+    }
+
+    .sealed-note {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      opacity: 0.6;
+      margin-top: 1.25rem;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -195,6 +253,44 @@
       return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     }
 
+    // Question progress state
+    const currentQuestion = user.current_question || 0;
+    const questionsAnswered = currentQuestion - 1; // current_question increments after sending, so answered = current - 1
+    const answeredCount = Math.max(0, questionsAnswered);
+    const allAnswered = answeredCount >= 4;
+    const hasStarted = currentQuestion > 0;
+
+    // Build progress dots (4 total)
+    function buildDots(answered) {
+      let dots = '';
+      for (let i = 0; i < 4; i++) {
+        dots += `<span class="dot ${i < answered ? 'dot-filled' : ''}"></span>`;
+      }
+      return dots;
+    }
+
+    // Letter One progress block
+    let letterOneProgress = '';
+    if (hasStarted) {
+      if (allAnswered) {
+        letterOneProgress = `
+          <div class="progress">
+            <span class="progress-label">Progress</span>
+            ${buildDots(4)}
+          </div>
+          <p class="sealed-note">Your envelope is sealed.</p>
+        `;
+      } else {
+        letterOneProgress = `
+          <div class="progress">
+            <span class="progress-label">Progress</span>
+            ${buildDots(answeredCount)}
+          </div>
+          <a class="answer-cta" href="/answer?token=${token}">Answer question ${answeredCount + 1} →</a>
+        `;
+      }
+    }
+
     document.getElementById('content').innerHTML = `
       <svg width="90" height="112" viewBox="-10 -16 100 172" role="img" xmlns="http://www.w3.org/2000/svg">
         <path d="M34 22 Q34 -6 58 -10 Q82 -6 82 22 Z" fill="#252318" stroke="#C9A96E" stroke-width="2"/>
@@ -228,6 +324,7 @@
           </div>
           <p class="letter-desc">Written at the edge of everything you've known. A chance to speak honestly about who you've been.</p>
           <p class="letter-date">Arrives ${formatDate(letterOne)}</p>
+          ${letterOneProgress}
         </div>
 
         <div class="letter-connector"></div>
