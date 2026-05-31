@@ -584,7 +584,7 @@
     });
   }
 
-  async function handleSignup() {
+async function handleSignup() {
     const fname = document.getElementById('fname').value.trim();
     const email = document.getElementById('email').value.trim();
     const month = document.getElementById('ret-month').value;
@@ -596,6 +596,17 @@
       return;
     }
 
+    const retdate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minDate = new Date(today);
+    minDate.setDate(minDate.getDate() + 14);
+    const selectedDate = new Date(`${retdate}T12:00:00`);
+
+    if (selectedDate < minDate) {
+      alert('Your retirement date needs to be at least 2 weeks away. Please choose a later date.');
+      return;
+    }
     // Format date as YYYY-MM-DD for Supabase
     const retdate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     const token = crypto.randomUUID();
