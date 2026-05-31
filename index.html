@@ -608,7 +608,6 @@ async function handleSignup() {
       return;
     }
     // Format date as YYYY-MM-DD for Supabase
-    const retdate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     const token = crypto.randomUUID();
 
    // Save to Supabase
