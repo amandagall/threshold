@@ -372,19 +372,11 @@
     <button class="btn" id="seal-btn" onclick="sealAnswer()">Seal this answer</button>
   </div>
  
-  <div class="sealed-view" id="sealed-view">
-    <svg width="140" height="100" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="22" width="136" height="76" fill="#242220" stroke="#C9A96E" stroke-width="1.5"/>
-      <path d="M2 22 L70 10 L138 22" fill="#1e1c18" stroke="#C9A96E" stroke-width="1.5"/>
-      <rect x="35" y="38" width="70" height="46" fill="#2a2820" stroke="#C9A96E" stroke-width="1" opacity="0.9"/>
-      <line x1="35" y1="52" x2="105" y2="52" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
-      <line x1="35" y1="62" x2="105" y2="62" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
-      <line x1="35" y1="72" x2="88" y2="72" stroke="#C9A96E" stroke-width="0.5" opacity="0.4"/>
-    </svg>
-    <p class="sealed-message" id="sealed-message">That's all for today.</p>
-    <p class="sealed-sub" id="sealed-sub">Your answer has been folded and placed in your envelope. The next question arrives in a few days.</p>
-    <a class="back-link" id="back-link" href="#">Return to your capsule</a>
-  </div>
+<div class="sealed-view" id="sealed-view">
+  <div id="lottie-envelope" style="width:220px; height:220px;"></div>
+  <p class="sealed-message" id="sealed-message">That's all for today.</p>
+  <p class="sealed-sub" id="sealed-sub">Your answer has been folded and placed in your envelope. The next question arrives in a few days.</p>
+  <a class="back-link" id="back-link" href="#">Return to your capsule</a>
 </div>
  
 <script>
@@ -501,16 +493,24 @@
     }
   }
  
-  function sealAnswer() {
-    document.getElementById('witness-view').style.display = 'none';
-    const sealed = document.getElementById('sealed-view');
-    sealed.style.display = 'flex';
-    sealed.classList.add('fadein');
- 
-    if (currentQuestion === 3) {
-      document.getElementById('sealed-message').textContent = 'Sealed.';
-      document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
-    }
+function sealAnswer() {
+  document.getElementById('witness-view').style.display = 'none';
+  const sealed = document.getElementById('sealed-view');
+  sealed.style.display = 'flex';
+  sealed.classList.add('fadein');
+
+  lottie.loadAnimation({
+    container: document.getElementById('lottie-envelope'),
+    renderer: 'svg',
+    loop: false,
+    autoplay: true,
+    path: '/threshold_envelope.json'
+  });
+
+  if (currentQuestion === 3) {
+    document.getElementById('sealed-message').textContent = 'Sealed.';
+    document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
+  }
   }
  
   loadQuestion();
