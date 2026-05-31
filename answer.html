@@ -364,8 +364,7 @@
 <div class="witness-view" id="witness-view">
     <p class="witness-label">A reflection</p>
     <p class="witness-text" id="witness-text"></p>
-    <button class="btn" id="seal-btn" onclick="sealAnswer()" style="margin-top: 2.5rem;">Seal this answer</button>
-  </div>
+<button class="btn" id="submit-btn" onclick="submitAnswer()">Seal this answer</button>  </div>
   <div class="sealed-view" id="sealed-view">
     <svg width="140" height="100" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="22" width="136" height="76" fill="#242220" stroke="#C9A96E" stroke-width="1.5"/>
@@ -423,7 +422,8 @@
     document.getElementById('meta-question').textContent = `Question ${currentQuestion + 1} of 4`;
     document.querySelector('.card-front-cta').textContent = `Reveal Question ${currentQuestion + 1}`;
     document.getElementById('back-link').href = `/room?token=${token}`;
-  }
+  
+  document.getElementById('submit-btn').textContent = currentQuestion === 3 ? 'Seal the envelope' : 'Fold this in';}
 
   function revealQuestion() {
     if (revealed) return;
@@ -446,8 +446,7 @@ async function submitAnswer() {
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
-  btn.textContent = 'Sealing...';
-
+btn.textContent = currentQuestion === 3 ? 'Sealing...' : 'Folding in...';
   const answerField = `answer_${currentQuestion + 1}`;
   const question = questions[currentQuestion];
 
