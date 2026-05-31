@@ -260,36 +260,47 @@
     const allAnswered = answeredCount >= 4;
     const hasStarted = currentQuestion > 0;
 
-    // Build progress dots (4 total)
-    function buildDots(answered) {
-      let dots = '';
-      for (let i = 0; i < 4; i++) {
-        dots += `<span class="dot ${i < answered ? 'dot-filled' : ''}"></span>`;
-      }
-      return dots;
-    }
+// Question progress state
+const currentQuestion = user.current_question || 0;
+const answeredCount = Math.min(4, Object.keys(user).filter(k => k.startsWith('answer_') && user[k]).length);
+const allAnswered = answeredCount >= 4;
+const questionWaiting = currentQuestion > answeredCount && !allAnswered;
 
-    // Letter One progress block
-    let letterOneProgress = '';
-    if (hasStarted) {
-      if (allAnswered) {
-        letterOneProgress = `
-          <div class="progress">
-            <span class="progress-label">Progress</span>
-            ${buildDots(4)}
-          </div>
-          <p class="sealed-note">Your envelope is sealed.</p>
-        `;
-      } else {
-        letterOneProgress = `
-          <div class="progress">
-            <span class="progress-label">Progress</span>
-            ${buildDots(answeredCount)}
-          </div>
-          <a class="answer-cta" href="/answer?token=${token}">Answer question ${answeredCount + 1} →</a>
-        `;
-      }
-    }
+// Build progress dots (4 total)
+function buildDots(answered) {
+  let dots = '';
+  for (let i = 0; i < 4; i++) {
+    dots += `<span class="dot ${i < answered ? 'dot-filled' : ''}"></span>`;
+  }
+  return dots;
+}
+
+// Letter One progress block
+let letterOneProgress = '';
+if (allAnswered) {
+  letterOneProgress = `
+    <div class="progress">
+      <span class="progress-label">Progress</span>
+      ${buildDots(4)}
+    </div>
+    <p class="sealed-note">Your envelope is sealed.</p>
+  `;
+} else if (questionWaiting) {
+  letterOneProgress = `
+    <div class="progress">
+      <span class="progress-label">Progress</span>
+      ${buildDots(answeredCount)}
+    </div>
+    <a class="answer-cta" href="/answer?token=${token}">A question is waiting →</a>
+  `;
+} else if (answeredCount > 0) {
+  letterOneProgress = `
+    <div class="progress">
+      <span class="progress-label">Progress</span>
+      ${buildDots(answeredCount)}
+    </div>
+  `;
+}    }
 
     document.getElementById('content').innerHTML = `
       <svg width="90" height="112" viewBox="-10 -16 100 172" role="img" xmlns="http://www.w3.org/2000/svg">
