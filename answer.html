@@ -499,19 +499,24 @@ function sealAnswer() {
   sealed.style.display = 'flex';
   sealed.classList.add('fadein');
 
-  lottie.loadAnimation({
-    container: document.getElementById('lottie-envelope'),
-    renderer: 'svg',
-    loop: false,
-    autoplay: true,
-    path: '/threshold_envelope.json'
-  });
-
   if (currentQuestion === 3) {
     document.getElementById('sealed-message').textContent = 'Sealed.';
     document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
   }
-  }
+
+  setTimeout(() => {
+    const container = document.getElementById('lottie-envelope');
+    if (container) {
+      lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: false,
+        autoplay: true,
+        path: '/threshold_envelope.json'
+      });
+    }
+  }, 100);
+}  
  
   loadQuestion();
 </script>
