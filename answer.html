@@ -363,6 +363,7 @@
       <textarea class="answer-box" id="answer-input" placeholder="Begin writing here..."></textarea>
       <p class="seal-note">Once you submit, <em>your answer will be folded and placed in your envelope.</em> It cannot be edited.</p>
       <button class="btn" id="submit-btn" onclick="submitAnswer()">Continue</button>
+      <a id="back-link-early" href="#" style="display:block; margin-top:1.25rem; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); text-decoration:none;">Return to your capsule</a>
     </div>
   </div>
  
@@ -421,6 +422,7 @@
     document.getElementById('meta-question').textContent = `Question ${currentQuestion + 1} of 4`;
     document.querySelector('.card-front-cta').textContent = `Reveal Question ${currentQuestion + 1}`;
     document.getElementById('back-link').href = `/room?token=${token}`;
+    document.getElementById('back-link-early').href = `/room?token=${token}`;
  
     // Set seal button copy based on question number
     const sealBtn = document.getElementById('seal-btn');
