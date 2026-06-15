@@ -473,7 +473,7 @@
     btn.disabled = true;
     btn.textContent = 'Receiving...';
 
-    const answerField = `answer_${currentQuestion + 1}`;
+    const answerField = `answer_${(currentLetter - 1) * 4 + currentQuestion + 1}`;
     const question = currentQuestions[currentQuestion];
 
     await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}`, {
