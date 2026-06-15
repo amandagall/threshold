@@ -465,7 +465,7 @@
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ [answerField]: answer })
+      body: JSON.stringify({ [answerField]: answer, current_question: currentQuestion + 2 })
     });
  
     // Call the witness API
