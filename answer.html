@@ -465,8 +465,7 @@
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify({ [answerField]: answer, current_question: currentQuestion + 2 })
-    });
+body: JSON.stringify({ [answerField]: answer })    ;
  
     // Call the witness API
     let reflection = null;
