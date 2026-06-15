@@ -9,9 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; 
-    }
- 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
       --bg: #1C1C1A;
       --gold: #C9A96E;
@@ -20,7 +19,7 @@
       --text-muted: rgba(242, 237, 228, 0.42);
       --card-bg: #2a2820;
     }
- 
+
     html, body {
       min-height: 100%;
       background: var(--bg);
@@ -29,7 +28,7 @@
       font-weight: 300;
       -webkit-font-smoothing: antialiased;
     }
- 
+
     .page {
       max-width: 560px;
       margin: 0 auto;
@@ -39,7 +38,7 @@
       align-items: center;
       text-align: center;
     }
- 
+
     .wordmark {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
@@ -48,7 +47,7 @@
       color: var(--gold);
       margin-bottom: 2.5rem;
     }
- 
+
     .meta-letter {
       font-size: 0.68rem;
       letter-spacing: 0.2em;
@@ -57,7 +56,7 @@
       opacity: 0.85;
       margin-bottom: 0.4rem;
     }
- 
+
     .meta-question {
       font-size: 0.6rem;
       letter-spacing: 0.18em;
@@ -66,8 +65,7 @@
       opacity: 0.5;
       margin-bottom: 2.5rem;
     }
- 
-    /* ── CARD FLIP ── */
+
     .card-scene {
       width: 320px;
       height: 200px;
@@ -77,7 +75,7 @@
       border-radius: 8px;
       position: relative;
     }
- 
+
     .card {
       width: 100%;
       height: 100%;
@@ -85,11 +83,11 @@
       transform-style: preserve-3d;
       transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
- 
+
     .card.flipped {
       transform: rotateY(180deg);
     }
- 
+
     .card-face {
       position: absolute;
       inset: 0;
@@ -104,11 +102,11 @@
       border-radius: 8px;
       box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.15), 0 4px 24px rgba(0,0,0,0.4);
     }
- 
+
     .card-back {
       transform: rotateY(180deg);
     }
- 
+
     .card-front-label {
       font-size: 0.65rem;
       letter-spacing: 0.2em;
@@ -117,7 +115,7 @@
       opacity: 0.7;
       margin-bottom: 1rem;
     }
- 
+
     .card-front-cta {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
@@ -125,7 +123,7 @@
       color: var(--cream);
       opacity: 0.85;
     }
- 
+
     .card-corner {
       position: absolute;
       top: 0.75rem;
@@ -135,7 +133,7 @@
       border-top: 1px solid var(--gold-dim);
       border-right: 1px solid var(--gold-dim);
     }
- 
+
     .card-question {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
@@ -144,7 +142,7 @@
       color: var(--cream);
       text-wrap: balance;
     }
- 
+
     .tap-hint {
       position: absolute;
       bottom: 1rem;
@@ -155,13 +153,12 @@
       z-index: 10;
       user-select: none;
     }
- 
+
     @keyframes pulse-finger {
       0%, 100% { opacity: 0.9; transform: scale(1); }
       50% { opacity: 0.3; transform: scale(0.85); }
     }
- 
-    /* ── WRITING AREA ── */
+
     .writing-area {
       width: 100%;
       opacity: 0;
@@ -169,13 +166,13 @@
       transition: opacity 1.4s ease, transform 1.4s ease;
       pointer-events: none;
     }
- 
+
     .writing-area.visible {
       opacity: 1;
       transform: translateY(0);
       pointer-events: all;
     }
- 
+
     .privacy-note {
       font-size: 0.82rem;
       color: var(--text-muted);
@@ -183,7 +180,7 @@
       line-height: 1.6;
       text-align: left;
     }
- 
+
     .answer-box {
       width: 100%;
       min-height: 200px;
@@ -201,16 +198,16 @@
       margin-bottom: 0.75rem;
       text-align: left;
     }
- 
+
     .answer-box:focus {
       border-color: rgba(201, 169, 110, 0.5);
     }
- 
+
     .answer-box::placeholder {
       color: rgba(242, 237, 228, 0.2);
       font-style: italic;
     }
- 
+
     .seal-note {
       font-size: 0.75rem;
       color: var(--text-muted);
@@ -218,12 +215,12 @@
       line-height: 1.6;
       text-align: left;
     }
- 
+
     .seal-note em {
       color: rgba(242, 237, 228, 0.55);
       font-style: normal;
     }
- 
+
     .btn {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
@@ -237,18 +234,17 @@
       cursor: pointer;
       transition: border-color 0.4s ease, background 0.4s ease;
     }
- 
+
     .btn:hover {
       border-color: var(--gold);
       background: rgba(201, 169, 110, 0.07);
     }
- 
+
     .btn:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
- 
-    /* ── WITNESS VIEW ── */
+
     .witness-view {
       display: none;
       flex-direction: column;
@@ -257,11 +253,11 @@
       padding: 2rem 0;
       max-width: 460px;
     }
- 
+
     .witness-view.visible {
       display: flex;
     }
- 
+
     .witness-label {
       font-size: 0.65rem;
       letter-spacing: 0.22em;
@@ -270,7 +266,7 @@
       opacity: 0.6;
       margin-bottom: 1.75rem;
     }
- 
+
     .witness-text {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
@@ -282,8 +278,7 @@
       text-wrap: balance;
       margin-bottom: 3rem;
     }
- 
-    /* ── SEALED VIEW ── */
+
     .sealed-view {
       display: none;
       flex-direction: column;
@@ -291,11 +286,11 @@
       text-align: center;
       padding: 2rem 0;
     }
- 
+
     .sealed-view.visible {
       display: flex;
     }
- 
+
     .sealed-message {
       font-family: 'DM Serif Display', serif;
       font-style: italic;
@@ -304,7 +299,7 @@
       margin-top: 2rem;
       margin-bottom: 1rem;
     }
- 
+
     .sealed-sub {
       font-size: 0.9rem;
       color: var(--text-muted);
@@ -313,7 +308,7 @@
       text-wrap: balance;
       margin-bottom: 2.5rem;
     }
- 
+
     .back-link {
       font-size: 0.75rem;
       letter-spacing: 0.18em;
@@ -323,41 +318,39 @@
       border-bottom: 1px solid var(--gold-dim);
       padding-bottom: 0.2rem;
     }
- 
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
- 
+
     .fadein { animation: fadeUp 0.7s ease forwards; }
   </style>
 </head>
 <body>
- 
+
 <div class="page">
   <p class="wordmark">Threshold</p>
- 
+
   <div id="main-view" style="width:100%; display:flex; flex-direction:column; align-items:center;">
     <p class="meta-letter" id="meta-letter">Letter One · Before</p>
     <p class="meta-question" id="meta-question">Question 1 of 4</p>
- 
+
     <div class="card-scene" id="card-scene" onclick="revealQuestion()" style="border-radius:8px;">
       <div class="tap-hint" id="tap-hint"><img src="/tap-hint.png" width="36" height="36" style="filter: invert(1); opacity: 0.7;" /></div>
       <div class="card" id="card">
-        <!-- Front — blank card -->
         <div class="card-face card-front" style="border-radius:8px; border:1px solid rgba(201,169,110,0.5); box-shadow:0 0 0 1px rgba(201,169,110,0.15), 0 4px 24px rgba(0,0,0,0.4);">
           <div class="card-corner"></div>
           <p class="card-front-label">Your question awaits</p>
           <p class="card-front-cta" id="reveal-cta">Reveal Question 1</p>
         </div>
-        <!-- Back — question -->
         <div class="card-face card-back" style="border-radius:8px; border:1px solid rgba(201,169,110,0.5); box-shadow:0 0 0 1px rgba(201,169,110,0.15), 0 4px 24px rgba(0,0,0,0.4);">
           <div class="card-corner"></div>
           <p class="card-question" id="card-question-text"></p>
         </div>
       </div>
     </div>
- 
+
     <div class="writing-area" id="writing-area">
       <p class="privacy-note">Take your time. There's no right answer — only an honest one.</p>
       <textarea class="answer-box" id="answer-input" placeholder="Begin writing here..."></textarea>
@@ -366,77 +359,104 @@
       <a id="back-link-early" href="#" style="display:block; margin-top:1.25rem; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-muted); text-decoration:none;">Return to your capsule</a>
     </div>
   </div>
- 
+
   <div class="witness-view" id="witness-view">
     <p class="witness-label">A reflection</p>
     <p class="witness-text" id="witness-text"></p>
     <button class="btn" id="seal-btn" onclick="sealAnswer()">Seal this answer</button>
   </div>
- 
-<div class="sealed-view" id="sealed-view">
-  <div id="lottie-envelope" style="width:220px; height:220px;"></div>
-  <p class="sealed-message" id="sealed-message">That's all for today.</p>
-  <p class="sealed-sub" id="sealed-sub">Your answer has been folded and placed in your envelope. The next question arrives in a few days.</p>
-  <a class="back-link" id="back-link" href="#">Return to your capsule</a>
+
+  <div class="sealed-view" id="sealed-view">
+    <div id="lottie-envelope" style="width:220px; height:220px;"></div>
+    <p class="sealed-message" id="sealed-message">That's all for today.</p>
+    <p class="sealed-sub" id="sealed-sub">Your answer has been folded and placed in your envelope. The next question arrives in a few days.</p>
+    <a class="back-link" id="back-link" href="#">Return to your capsule</a>
+  </div>
 </div>
- 
+
 <script>
   const SUPABASE_URL = 'https://fvdsizuvdaanstgvhkmt.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2ZHNpenV2ZGFhbnN0Z3Zoa210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODExMjIsImV4cCI6MjA5NTY1NzEyMn0.xQOHZVbndtkkP8VwZeTIQvT7Pu2RFeLCTGYaNzdYQcI';
- 
-  const questions = [
-    'What part of yourself do you leave in the car every morning before you walk in?',
-    'What would quietly fall apart without you?',
-    'Who at work will you actually miss — and does that surprise you?',
-    'What are you quietly sad about that you haven\'t fully admitted yet?'
-  ];
- 
+
+  const letters = {
+    1: {
+      name: 'Letter One · Before',
+      questions: [
+        'What part of yourself do you leave in the car every morning before you walk in?',
+        'What would quietly fall apart without you?',
+        'Who at work will you actually miss — and does that surprise you?',
+        'What are you quietly sad about that you haven\'t fully admitted yet?'
+      ]
+    },
+    2: {
+      name: 'Letter Two · After',
+      questions: [
+        'What does a good day look like now — and how often does one actually happen?',
+        'Is there something you expected to miss that you don\'t? What do you make of that?',
+        'What are you doing with the quiet — and is that working?',
+        'Is there something you keep meaning to start? What\'s actually in the way?'
+      ]
+    },
+    3: {
+      name: 'Letter Three · Beyond',
+      questions: [
+        'What\'s something you used to keep on top of that you\'ve let slide — and how do you actually feel about that?',
+        'What small thing has surprised you by making you genuinely happy?',
+        'What do you know now about yourself that you couldn\'t have known a year ago?',
+        'If the person who wrote Letter One could see you now, what would surprise them most?'
+      ]
+    }
+  };
+
   let currentUser = null;
   let currentQuestion = 0;
+  let currentLetter = 1;
+  let currentQuestions = [];
   let token = null;
   let revealed = false;
- 
+
   async function loadQuestion() {
     const params = new URLSearchParams(window.location.search);
     token = params.get('token');
- 
+
     if (!token) return;
- 
+
     const response = await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}&select=*`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
- 
+
     const data = await response.json();
     if (!data || data.length === 0) return;
- 
+
     currentUser = data[0];
+    currentLetter = currentUser.current_letter || 1;
     currentQuestion = currentUser.current_question - 1;
- 
-    if (currentQuestion < 0 || currentQuestion >= questions.length) {
+    currentQuestions = letters[currentLetter].questions;
+
+    if (currentQuestion < 0 || currentQuestion >= currentQuestions.length) {
       document.getElementById('card-question-text').textContent = 'No question is ready yet.';
       return;
     }
- 
-    document.getElementById('card-question-text').textContent = questions[currentQuestion];
-    document.getElementById('meta-letter').textContent = 'Letter One · Before';
+
+    document.getElementById('card-question-text').textContent = currentQuestions[currentQuestion];
+    document.getElementById('meta-letter').textContent = letters[currentLetter].name;
     document.getElementById('meta-question').textContent = `Question ${currentQuestion + 1} of 4`;
     document.querySelector('.card-front-cta').textContent = `Reveal Question ${currentQuestion + 1}`;
     document.getElementById('back-link').href = `/room?token=${token}`;
     document.getElementById('back-link-early').href = `/room?token=${token}`;
- 
-    // Set seal button copy based on question number
+
     const sealBtn = document.getElementById('seal-btn');
     sealBtn.textContent = currentQuestion === 3 ? 'Seal the envelope' : 'Seal this answer';
   }
- 
+
   function revealQuestion() {
     if (revealed) return;
     revealed = true;
- 
+
     document.getElementById('card').classList.add('flipped');
     document.getElementById('card-scene').style.cursor = 'default';
     document.getElementById('tap-hint').style.display = 'none';
- 
+
     setTimeout(() => {
       document.getElementById('writing-area').classList.add('visible');
       setTimeout(() => {
@@ -444,19 +464,18 @@
       }, 600);
     }, 2000);
   }
- 
+
   async function submitAnswer() {
     const answer = document.getElementById('answer-input').value.trim();
     if (!answer) { alert('Please write something before continuing.'); return; }
- 
+
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
     btn.textContent = 'Receiving...';
- 
+
     const answerField = `answer_${currentQuestion + 1}`;
-    const question = questions[currentQuestion];
- 
-    // Save to Supabase
+    const question = currentQuestions[currentQuestion];
+
     await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}`, {
       method: 'PATCH',
       headers: {
@@ -465,9 +484,9 @@
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-body: JSON.stringify({ [answerField]: answer })    ;
- 
-    // Call the witness API
+      body: JSON.stringify({ [answerField]: answer })
+    });
+
     let reflection = null;
     try {
       const witnessRes = await fetch('/api/witness', {
@@ -480,10 +499,9 @@ body: JSON.stringify({ [answerField]: answer })    ;
     } catch (err) {
       console.error('Witness error:', err);
     }
- 
-    // Hide main view
+
     document.getElementById('main-view').style.display = 'none';
- 
+
     if (reflection) {
       document.getElementById('witness-text').textContent = reflection;
       const witnessView = document.getElementById('witness-view');
@@ -493,34 +511,34 @@ body: JSON.stringify({ [answerField]: answer })    ;
       sealAnswer();
     }
   }
- 
-function sealAnswer() {
-  document.getElementById('witness-view').style.display = 'none';
-  const sealed = document.getElementById('sealed-view');
-  sealed.style.display = 'flex';
-  sealed.classList.add('fadein');
 
-  if (currentQuestion === 3) {
-    document.getElementById('sealed-message').textContent = 'Sealed.';
-    document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
+  function sealAnswer() {
+    document.getElementById('witness-view').style.display = 'none';
+    const sealed = document.getElementById('sealed-view');
+    sealed.style.display = 'flex';
+    sealed.classList.add('fadein');
+
+    if (currentQuestion === 3) {
+      document.getElementById('sealed-message').textContent = 'Sealed.';
+      document.getElementById('sealed-sub').textContent = 'All four answers are inside. Your envelope has been sealed and placed in your capsule.';
+    }
+
+    setTimeout(() => {
+      const container = document.getElementById('lottie-envelope');
+      if (container) {
+        lottie.loadAnimation({
+          container: container,
+          renderer: 'svg',
+          loop: false,
+          autoplay: true,
+          path: '/threshold_envelope.json'
+        });
+      }
+    }, 100);
   }
 
-  setTimeout(() => {
-    const container = document.getElementById('lottie-envelope');
-    if (container) {
-      lottie.loadAnimation({
-        container: container,
-        renderer: 'svg',
-        loop: false,
-        autoplay: true,
-        path: '/threshold_envelope.json'
-      });
-    }
-  }, 100);
-}  
- 
   loadQuestion();
 </script>
- 
+
 </body>
 </html>
