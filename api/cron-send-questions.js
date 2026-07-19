@@ -191,15 +191,31 @@ async function sendQuestionEmail(user, questionIndex) {
   return true;
 }
 
-async function updateUserQuestion(userId, newQuestionNumber) {
-  await fetch(`${SUPABASE_URL}/rest/v1/signups?id=eq.${userId}`, {
+// CHANGED: was `updateUserQuestion(userId, newQuestionNumber)`.
+// Now handles the letter transition: when the question just sent was the
+// 4th (last) one of the letter, file that letter and advance to the next
+// one. Otherwise, just bump current_question as before.
+async function advanceUser(user, questionIndex) {
+  const isLastQuestionOfLetter = questionIndex === 3; // 0-indexed: 3 = the 4th question
+
+  const updates = isLastQuestionOfLetter
+    ? {
+        [`letter_${user.current_letter}_filed`]: true,
+        current_letter: user.current_letter + 1,
+        current_question: 0
+      }
+    : {
+        current_question: user.current_question + 1
+      };
+
+  await fetch(`${SUPABASE_URL}/rest/v1/signups?id=eq.${user.id}`, {
     method: 'PATCH',
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': `Bearer ${SUPABASE_KEY}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ current_question: newQuestionNumber })
+    body: JSON.stringify(updates)
   });
 }
 
@@ -213,7 +229,8 @@ module.exports = async function handler(req, res) {
       const sent = await sendQuestionEmail(user, questionIndex);
 
       if (sent) {
-        await updateUserQuestion(user.id, user.current_question + 1);
+        // CHANGED: was `await updateUserQuestion(user.id, user.current_question + 1);`
+        await advanceUser(user, questionIndex);
         results.push({ email: user.email, letter: user.current_letter, question: questionIndex + 1, status: 'sent' });
       } else {
         results.push({ email: user.email, letter: user.current_letter, question: questionIndex + 1, status: 'failed' });
