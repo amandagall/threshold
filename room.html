@@ -221,11 +221,14 @@
       return;
     }
 
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/signups?token=eq.${token}&select=*`, {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_signup_by_token`, {
+      method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
-      }
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_token: token })
     });
 
     const data = await response.json();
