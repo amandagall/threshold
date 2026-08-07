@@ -115,26 +115,27 @@
     position: relative;
     z-index: 2;
     text-align: center;
-    max-width: 760px;
+    max-width: 900px;
     padding: 2rem;
   }
 
-  .wordmark-inline{
-    font-family: 'DM Serif Display', serif;
+  .wordmark{
+    font-size: clamp(2.8rem, 8vw, 4.6rem);
     font-style: italic;
-    font-size: 0.95rem;
-    letter-spacing: 0.1em;
-    color: var(--gold);
-    margin-bottom: 2.5rem;
-  }
-
-  .hero-title{
-    font-size: clamp(2.6rem, 7vw, 4rem);
-    font-style: italic;
-    line-height: 1.15;
     color: var(--cream);
     margin: 0 0 1.75rem;
     text-shadow: 0 2px 24px rgba(0,0,0,0.5);
+  }
+
+  .hero-line{
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+    line-height: 1.5;
+    color: var(--cream);
+    max-width: 860px;
+    white-space: normal;
+    margin: 0 auto 1.5rem;
   }
 
   .hero-sub{
@@ -397,8 +398,8 @@
   <img alt="" src="https://images.unsplash.com/photo-1476611317561-60117649dd94?auto=format&fit=crop&w=1800&q=70">
   <div class="overlay"></div>
   <div class="hero-inner">
-    <p class="wordmark-inline">Threshold</p>
-    <h1 class="hero-title">There are ceremonies for the beginnings everyone sees.<br>This is for the ones only you do.</h1>
+    <h1 class="wordmark">Threshold</h1>
+    <p class="hero-line">There are ceremonies for the beginnings everyone sees.<br>This is for the ones only you do.</p>
     <p class="hero-sub">A place to be witnessed through the moments that change you — before, during, and long after.</p>
     <a href="#choose" class="btn">Try it</a>
   </div>
