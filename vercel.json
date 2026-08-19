@@ -2,11 +2,16 @@
   "rewrites": [
     { "source": "/room", "destination": "/room.html" },
     { "source": "/answer", "destination": "/answer.html" },
-    { "source": "/retirement", "destination": "/retirement.html" }
+    { "source": "/retirement", "destination": "/retirement.html" },
+    { "source": "/return", "destination": "/return.html" }
   ],
   "crons": [
     {
       "path": "/api/cron-send-questions",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron-return-trigger",
       "schedule": "0 9 * * *"
     },
     {
