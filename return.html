@@ -143,7 +143,10 @@
     .loading { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.06em; }
 
     /* ── Capsule SVGs (sealed / open) — same paths as room.html and retirement.html ── */
-    .capsule-wrap { margin-bottom: 2rem; position: relative; height: 112px; width: 90px; }
+    /* Block elements with a fixed width don't center themselves inside a non-flex
+       parent just because their siblings look centered — text-align:center centers
+       text regardless of the box it's in, but this div needs its own auto margins. */
+    .capsule-wrap { margin: 0 auto 2rem; position: relative; height: 112px; width: 90px; }
     .capsule-wrap svg { position: absolute; inset: 0; transition: opacity 1.1s ease; }
     .capsule-sealed { opacity: 1; }
     .capsule-open { opacity: 0; }
