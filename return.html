@@ -95,6 +95,13 @@
       text-wrap: balance;
     }
 
+    /* Left-aligned deliberately, even though .page centers everything else: a
+       multi-sentence paragraph set in centered type reads as ragged/"off" no matter
+       how carefully it's balanced — that's the "wonky" alignment feedback. .paper
+       already made this call for question/answer text; body-copy never got the same
+       treatment. The paragraph block itself still sits centered on the page (via
+       .page's flex align-items:center) — only the text inside it runs left-aligned,
+       same pattern as a centered card with readable left-aligned body text. */
     .body-copy {
       font-size: 1rem;
       line-height: 1.9;
@@ -102,6 +109,7 @@
       max-width: 440px;
       margin-bottom: 1rem;
       text-wrap: balance;
+      text-align: left;
     }
 
     .body-copy em { color: var(--cream); font-style: italic; }
@@ -310,8 +318,15 @@
     .stepper .sep { color: rgba(242, 237, 228, 0.15); }
 
     /* Quiet back-navigation link, reusing .btn-quiet's look but as its own class
-       since .btn-quiet was never actually wired up to anything before now. */
+       since .btn-quiet was never actually wired up to anything before now.
+       Fixed to the top-left corner of the viewport (rather than sitting inline in
+       the content flow, below the main CTA) so it reads as a persistent piece of
+       page chrome — the same way the debug reset button is pinned top-right —
+       instead of just another button in the stack of content. */
     .back-link {
+      position: fixed;
+      top: 1.75rem;
+      left: 1.75rem;
       display: inline-block;
       border: none;
       background: none;
@@ -321,9 +336,10 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       cursor: pointer;
-      margin-top: 1rem;
+      margin: 0;
       text-decoration: underline;
       text-underline-offset: 3px;
+      z-index: 10;
     }
     .back-link:hover { color: var(--gold); }
 
@@ -332,6 +348,48 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .fadein { animation: fadeUp 0.8s ease forwards; }
+
+    /* ── "What Threshold Noticed" — the culminating moment of the whole ceremony,
+       so it needs to visually outweigh every other screen's plain .meta/.body-copy
+       treatment, not match it. A framed panel with a soft gold glow, an italic
+       serif eyebrow instead of the small-caps .meta label, and the reflection text
+       itself set larger and in the same serif-italic voice as the site's headlines
+       (rather than plain sans body copy) — so it reads as something arrived at,
+       not just another paragraph. ── */
+    .arc-frame {
+      width: 100%;
+      max-width: 480px;
+      padding: 2.75rem 2.25rem;
+      border: 1px solid rgba(201, 169, 110, 0.45);
+      border-radius: 2px;
+      background: radial-gradient(ellipse at top, rgba(201, 169, 110, 0.08), transparent 70%);
+      box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.1), 0 0 50px rgba(201, 169, 110, 0.07), 0 10px 32px rgba(0,0,0,0.35);
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .arc-eyebrow {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+    .arc-flourish {
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.55;
+      margin: 0 auto 1.75rem;
+    }
+    .arc-text {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      line-height: 1.85;
+      color: var(--cream);
+      text-wrap: balance;
+    }
 
     /* ── Interlude — the "quiet pause" between letters ── */
     .interlude-mark {
@@ -792,9 +850,12 @@
       }
     }
     render(`
-      <p class="meta">What Threshold Noticed</p>
-      <p class="body-copy" style="font-size: 0.9rem;">After reading all three letters together, here's the shape Threshold saw in your year:</p>
-      <p class="body-copy fadein" style="font-size: 1.05rem; line-height: 1.9;">${escapeHtml(user.arc_reflection)}</p>
+      <p class="body-copy" style="font-size: 0.85rem; text-align: center; margin-bottom: 2rem;">After reading all three letters together, here's the shape Threshold saw in your year.</p>
+      <div class="arc-frame fadein">
+        <p class="arc-eyebrow">What Threshold Noticed</p>
+        <div class="arc-flourish"></div>
+        <p class="arc-text">${escapeHtml(user.arc_reflection)}</p>
+      </div>
       <button class="btn" onclick="advance()">Continue</button>
       ${backLink()}
     `);
