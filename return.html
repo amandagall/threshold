@@ -245,54 +245,135 @@
       font-style: italic;
     }
 
-    /* ── Writing area for the 3 new reflection questions (mirrors answer.html) ── */
-    .writing-area {
+    /* ── The "paper" — the reflection round's question + your written answer.
+       Replaces a card-flip for this stage: unlike the old-letter cards (which are
+       revisiting something already sealed, so the tap-to-reveal ritual echoes the
+       original sealing), these are brand-new questions with nothing to reveal — the
+       flip read as a gimmick here. Every state change (write → answered) fully
+       replaces this element's content via render(), rather than hiding/showing
+       pieces of it, so there's no leftover invisible-but-space-occupying element
+       causing the layout gap that used to appear above the witness text. ── */
+    .paper {
       width: 100%;
       max-width: 440px;
-      opacity: 0;
-      transform: translateY(12px);
-      transition: opacity 1s ease, transform 1s ease;
-      pointer-events: none;
+      background: var(--card-bg);
+      border: 1px solid rgba(201, 169, 110, 0.5);
+      border-radius: 4px;
+      box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.15), 0 8px 28px rgba(0,0,0,0.4);
+      padding: 2rem 1.75rem;
+      text-align: left;
+      position: relative;
+      margin-bottom: 1.5rem;
     }
-    .writing-area.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+    /* A folded-corner cue to read as a page, not a generic card. */
+    .paper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 20px 20px 0;
+      border-color: transparent rgba(201, 169, 110, 0.2) transparent transparent;
+    }
+    .paper-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-bottom: 0.85rem;
+    }
+    .paper-question {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      color: var(--cream);
+      text-wrap: balance;
+    }
+    .paper-answer {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: rgba(242, 237, 228, 0.78);
+      text-wrap: balance;
+    }
 
     .answer-box {
       width: 100%;
-      min-height: 180px;
+      min-height: 160px;
       background: rgba(242, 237, 228, 0.04);
       border: 1px solid var(--gold-dim);
-      padding: 1.25rem;
+      padding: 1rem;
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       font-size: 1rem;
-      line-height: 1.9;
+      line-height: 1.8;
       color: var(--cream);
       outline: none;
       resize: vertical;
-      margin-bottom: 0.75rem;
       text-align: left;
+      margin-top: 1.25rem;
       transition: border-color 0.3s ease;
     }
     .answer-box:focus { border-color: rgba(201, 169, 110, 0.5); }
     .answer-box::placeholder { color: rgba(242, 237, 228, 0.2); font-style: italic; }
 
-    .witness-view {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      max-width: 460px;
+    /* The reflection is deliberately NOT printed on the paper — it's Threshold's
+       voice responding to what's on the page, not part of the page itself. */
+    .reflection-block {
+      width: 100%;
+      max-width: 440px;
+      text-align: left;
+      margin-bottom: 1rem;
     }
-    .witness-view.visible { display: flex; }
-    .witness-text {
+    .reflection-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.6;
+      margin-bottom: 0.75rem;
+    }
+    .reflection-text {
       font-family: 'DM Sans', sans-serif;
       font-style: italic;
       font-weight: 300;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       line-height: 1.85;
       color: var(--cream);
       opacity: 0.9;
       text-wrap: balance;
-      margin-bottom: 1.5rem;
+    }
+
+    /* ── Bottom progress dots — same pattern as retirement.html's onboarding dots,
+       reused here so the reflection round (3 questions) has a persistent sense of
+       "how much is left" in addition to the "Question N of 3" label up top. ── */
+    .dots {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 10;
+    }
+    .dots .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(242, 237, 228, 0.18);
+      transition: background 0.6s ease, width 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-radius 0.6s ease;
+    }
+    .dots .dot.active {
+      background: var(--gold);
+      width: 20px;
+      border-radius: 2px;
+    }
+    .dots .dot.done {
+      background: var(--gold-dim);
     }
 
     @keyframes fadeUp {
@@ -701,7 +782,25 @@
     renderArc();
   }
 
-  // Beats 5 & 6 — new reflection questions, typed, saved, and witnessed
+  // Bottom dot-progress indicator for the 3-question reflection round. `state` per
+  // dot: 'done' (answered already), 'active' (the one currently on screen), or
+  // neither (upcoming). Separate from the "Question N of 3" label up top — that
+  // says where you are, this says how much is left.
+  function renderDots(activeIndex) {
+    let dots = '';
+    for (let i = 0; i < 3; i++) {
+      const cls = i === activeIndex ? 'active' : (i < activeIndex ? 'done' : '');
+      dots += `<div class="dot ${cls}"></div>`;
+    }
+    return `<div class="dots">${dots}</div>`;
+  }
+
+  // Beats 5 & 6 — new reflection questions, typed, saved, and witnessed.
+  //
+  // No card flip here (unlike the old-letter cards): those are revisiting something
+  // already sealed, so tap-to-reveal echoes the original sealing ritual. These are
+  // brand-new questions with nothing to reveal, so the question is just... there,
+  // on the page, like something written to you rather than a puzzle to uncover.
   function renderReflectCard(step) {
     const { reflectIndex } = step;
     const n = reflectIndex + 1;
@@ -710,49 +809,26 @@
 
     render(`
       <p class="meta">Reflection — Question ${n} of 3</p>
-      <div class="card-scene" id="card-scene" onclick="revealReflectQuestion()">
-        <div class="card" id="card">
-          <div class="card-face card-front">
-            <p class="card-front-label">Your question awaits</p>
-            <p class="card-front-cta">Reveal Question ${n}</p>
-          </div>
-          <div class="card-face card-back">
-            <p class="card-answer-text">${escapeHtml(question)}</p>
-          </div>
-        </div>
-      </div>
-      <div class="writing-area" id="writing-area">
-        <p class="body-copy" style="font-size:0.88rem; text-align:left;">Take your time. There's no right answer — only an honest one.</p>
+      <div class="paper fadein">
+        <p class="paper-label">Threshold asks</p>
+        <p class="paper-question">${escapeHtml(question)}</p>
         <textarea class="answer-box" id="answer-input" placeholder="Begin writing here...">${existingAnswer ? escapeHtml(existingAnswer) : ''}</textarea>
-        <button class="btn" id="submit-btn" onclick="submitReflectAnswer(${n})">Continue</button>
       </div>
-      <div class="witness-view" id="witness-view">
-        <p class="meta" style="margin-bottom:1rem;">A reflection</p>
-        <p class="witness-text" id="witness-text"></p>
-        <button class="btn" onclick="advance()">Continue</button>
-      </div>
+      <p class="body-copy" style="font-size: 0.85rem;">Take your time. There's no right answer — only an honest one.</p>
+      <button class="btn" id="submit-btn" onclick="submitReflectAnswer(${n})">Continue</button>
+      ${renderDots(reflectIndex)}
     `);
-  }
-
-  function revealReflectQuestion() {
-    const scene = document.getElementById('card-scene');
-    if (scene.classList.contains('revealed')) return;
-    scene.classList.add('revealed');
-    document.getElementById('card').classList.add('flipped');
-    setTimeout(() => {
-      document.getElementById('writing-area').classList.add('visible');
-    }, 900);
   }
 
   async function submitReflectAnswer(n) {
     const answer = document.getElementById('answer-input').value.trim();
     if (!answer) { alert('Please write something before continuing.'); return; }
+    const question = user[`return_question_${n}`];
 
     const btn = document.getElementById('submit-btn');
     btn.disabled = true;
     btn.textContent = 'Receiving...';
 
-    const question = user[`return_question_${n}`];
     await persist({ [`return_answer_${n}`]: answer });
     user[`return_answer_${n}`] = answer;
 
@@ -775,18 +851,35 @@
       console.error('Witness error:', err);
     }
 
-    document.getElementById('card-scene').style.display = 'none';
-    document.getElementById('writing-area').classList.remove('visible');
-
     if (reflection) {
-      document.getElementById('witness-text').textContent = reflection;
-      const wv = document.getElementById('witness-view');
-      wv.classList.add('visible', 'fadein');
+      renderReflectWitness(n, question, answer, reflection);
     } else {
       // Same graceful-degradation pattern as answer.html: if the witness call fails,
       // don't block the user — just move on.
       advance();
     }
+  }
+
+  // The "read back" moment — the paper flips from write-mode to read-mode in place
+  // (a full render(), not a partial DOM toggle), so the reflection appears exactly
+  // where the question box was rather than lower down the page with a gap where the
+  // textarea used to be.
+  function renderReflectWitness(n, question, answer, reflection) {
+    render(`
+      <p class="meta">Reflection — Question ${n} of 3</p>
+      <div class="paper fadein">
+        <p class="paper-label">Threshold asked</p>
+        <p class="paper-question">${escapeHtml(question)}</p>
+        <div class="divider" style="margin: 1.1rem 0;"></div>
+        <p class="paper-answer">${escapeHtml(answer)}</p>
+      </div>
+      <div class="reflection-block fadein">
+        <p class="reflection-label">A reflection</p>
+        <p class="reflection-text">${escapeHtml(reflection)}</p>
+      </div>
+      <button class="btn" onclick="advance()">Continue</button>
+      ${renderDots(n - 1)}
+    `);
   }
 
   // End of TH-48's scope. Beats 7 (capsule-placing + essence label) and 8 (the shelf)
