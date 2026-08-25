@@ -153,109 +153,15 @@
     .capsule-wrap.opened .capsule-sealed { opacity: 0; }
     .capsule-wrap.opened .capsule-open { opacity: 1; }
 
-    /* ── Letter card (tap-to-reveal, reusing the same ritual as answer.html) ── */
-    .card-scene {
-      width: 320px;
-      max-width: 100%;
-      height: 300px;
-      perspective: 800px;
-      margin-bottom: 2rem;
-      cursor: pointer;
-      position: relative;
-    }
-    .card-scene.revealed { cursor: default; }
-
-    .card {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .card.flipped { transform: rotateY(180deg); }
-
-    .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      border: 1px solid rgba(201, 169, 110, 0.5);
-      background: var(--card-bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 1.75rem;
-      border-radius: 8px;
-      box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.15), 0 4px 24px rgba(0,0,0,0.4);
-      overflow-y: auto;
-    }
-    .card-back {
-      transform: rotateY(180deg);
-      /* Content here is variable-length (question + old answer + old witness), unlike
-         the fixed short front face — plain `center` clipped long questions at the top
-         with no way to scroll up to them. `safe center` centers short content (most
-         reflection-question cards) but falls back to top-aligned + scrollable the
-         moment content would overflow, instead of clipping silently. */
-      justify-content: safe center;
-      padding-top: 1.75rem;
-    }
-
-    .card-front-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.7;
-      margin-bottom: 1rem;
-    }
-    .card-front-cta {
-      font-family: 'DM Serif Display', serif;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: var(--cream);
-      opacity: 0.85;
-    }
-
-    .card-question-label {
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.7;
-      margin-bottom: 0.75rem;
-    }
-    .card-answer-text {
-      font-family: 'DM Serif Display', serif;
-      font-style: italic;
-      font-size: 1.15rem;
-      line-height: 1.55;
-      color: var(--cream);
-      margin-bottom: 1.1rem;
-      text-wrap: balance;
-    }
-    .card-witness-label {
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.55;
-      margin-bottom: 0.5rem;
-    }
-    .card-witness-text {
-      font-size: 0.88rem;
-      line-height: 1.7;
-      color: var(--text-muted);
-      font-style: italic;
-    }
-
-    /* ── The "paper" — the reflection round's question + your written answer.
-       Replaces a card-flip for this stage: unlike the old-letter cards (which are
-       revisiting something already sealed, so the tap-to-reveal ritual echoes the
-       original sealing), these are brand-new questions with nothing to reveal — the
-       flip read as a gimmick here. Every state change (write → answered) fully
-       replaces this element's content via render(), rather than hiding/showing
-       pieces of it, so there's no leftover invisible-but-space-occupying element
-       causing the layout gap that used to appear above the witness text. ── */
+    /* ── The "paper" — used both for revisiting an old letter's question+answer and
+       for the new reflection questions. No flip mechanic: the old-letter cards used
+       to tap-to-reveal (echoing the original sealing ritual), but that read as a
+       gimmick once there were TWO different card mechanics on one page for two
+       similar-feeling moments. One consistent "paper" treatment for anything
+       question+answer shaped, everywhere on this page. Every state change (write →
+       answered, or navigating between questions) fully replaces this element's
+       content via render(), rather than hiding/showing pieces of it, so there's
+       never a leftover invisible-but-space-occupying element causing a layout gap. ── */
     .paper {
       width: 100%;
       max-width: 440px;
@@ -379,6 +285,48 @@
       background: var(--gold-dim);
     }
 
+    /* ── Bottom letter-stepper — same fixed-bottom slot as .dots, but text labels
+       instead of dots, since "which of 3 letters am I reading" reads better as
+       named stages than abstract progress dots. Shown only during the letter-
+       reading phase; the reflection round further down still gets numeric dots
+       (3 near-identical questions don't need names, 3 differently-named letters do). ── */
+    .stepper {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      z-index: 10;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .stepper span { color: rgba(242, 237, 228, 0.22); transition: color 0.4s ease; }
+    .stepper span.current { color: var(--gold); }
+    .stepper span.done { color: rgba(242, 237, 228, 0.4); }
+    .stepper .sep { color: rgba(242, 237, 228, 0.15); }
+
+    /* Quiet back-navigation link, reusing .btn-quiet's look but as its own class
+       since .btn-quiet was never actually wired up to anything before now. */
+    .back-link {
+      display: inline-block;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 1rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .back-link:hover { color: var(--gold); }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -458,7 +406,29 @@
     }
   ];
 
-  const SEALED_CAPSULE_SVG = `<svg class="capsule-sealed" width="90" height="112" viewBox="-10 -16 100 172" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  // BUG FIX (Aug 25): these two were swapped. A capsule with the lid still ON
+  // (attached directly above the body, same rect) reads as sealed/closed; a capsule
+  // with the lid drawn OFF to the side with its own separate rim is the one that
+  // reads as open. The path data below is unchanged from before — only the variable
+  // each block lives in (and its class=) was corrected to match what it actually
+  // looks like, so the fade sequence goes sealed → open instead of the reverse.
+  const SEALED_CAPSULE_SVG = `<svg class="capsule-sealed" width="90" height="112" viewBox="-2 -8 54 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="0" y="28" width="50" height="90" fill="#242220" stroke="#C9A96E" stroke-width="2"/>
+    <path d="M0 28 Q0 0 25 -4 Q50 0 50 28 Z" fill="#2a2820" stroke="#C9A96E" stroke-width="2"/>
+    <path d="M0 118 Q0 146 25 150 Q50 146 50 118 Z" fill="#1e1c18" stroke="#C9A96E" stroke-width="2"/>
+    <line x1="0" y1="42" x2="50" y2="42" stroke="#C9A96E" stroke-width="1.2"/>
+    <line x1="0" y1="106" x2="50" y2="106" stroke="#C9A96E" stroke-width="1.2"/>
+    <circle cx="25" cy="73" r="16" fill="none" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="58" x2="25" y2="62" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="40" y1="73" x2="36" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="88" x2="25" y2="84" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="10" y1="73" x2="14" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="73" x2="18" y2="63" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="25" y1="73" x2="33" y2="64" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
+  </svg>`;
+
+  const OPEN_CAPSULE_SVG = `<svg class="capsule-open" width="90" height="112" viewBox="-10 -16 100 172" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path d="M34 22 Q34 -6 58 -10 Q82 -6 82 22 Z" fill="#252318" stroke="#C9A96E" stroke-width="2"/>
     <ellipse cx="58" cy="22" rx="24" ry="6" fill="#1e1c18" stroke="#C9A96E" stroke-width="1.5"/>
     <rect x="0" y="28" width="50" height="90" fill="#242220" stroke="#C9A96E" stroke-width="2"/>
@@ -476,28 +446,38 @@
     <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
   </svg>`;
 
-  const OPEN_CAPSULE_SVG = `<svg class="capsule-open" width="90" height="112" viewBox="-2 -8 54 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect x="0" y="28" width="50" height="90" fill="#242220" stroke="#C9A96E" stroke-width="2"/>
-    <path d="M0 28 Q0 0 25 -4 Q50 0 50 28 Z" fill="#2a2820" stroke="#C9A96E" stroke-width="2"/>
-    <path d="M0 118 Q0 146 25 150 Q50 146 50 118 Z" fill="#1e1c18" stroke="#C9A96E" stroke-width="2"/>
-    <line x1="0" y1="42" x2="50" y2="42" stroke="#C9A96E" stroke-width="1.2"/>
-    <line x1="0" y1="106" x2="50" y2="106" stroke="#C9A96E" stroke-width="1.2"/>
-    <circle cx="25" cy="73" r="16" fill="none" stroke="#C9A96E" stroke-width="1.5"/>
-    <line x1="25" y1="58" x2="25" y2="62" stroke="#C9A96E" stroke-width="1.5"/>
-    <line x1="40" y1="73" x2="36" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
-    <line x1="25" y1="88" x2="25" y2="84" stroke="#C9A96E" stroke-width="1.5"/>
-    <line x1="10" y1="73" x2="14" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
-    <line x1="25" y1="73" x2="18" y2="63" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
-    <line x1="25" y1="73" x2="33" y2="64" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round"/>
-    <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
-  </svg>`;
-
   // ── State ────────────────────────────────────────────────────────────────
   let token = null;
   let user = null;
   let steps = [];
   let stepIndex = 0;
   let returnWitnessPromise = null; // kicked off early so it's ready by the time we need it
+
+  // Debug-only self-service reset, so testing this doesn't require a manual SQL
+  // reset every time. Only appears with &debug=1 in the URL — never shown to a real
+  // user, and still requires a confirm() click since it writes to production data.
+  const DEBUG = new URLSearchParams(window.location.search).get('debug') === '1';
+
+  function injectDebugReset() {
+    const btn = document.createElement('button');
+    btn.textContent = '⟳ reset test data';
+    btn.className = 'back-link';
+    btn.style.cssText = 'position:fixed; top:1rem; right:1rem; margin:0; z-index:20;';
+    btn.onclick = debugReset;
+    document.body.appendChild(btn);
+  }
+
+  async function debugReset() {
+    if (!confirm('Reset the return round for this token? This clears the arc, all 3 reflection questions/answers/witnesses, and the capsule-placed flag, then reloads.')) return;
+    await persist({
+      arc_reflection: null,
+      return_question_1: null, return_question_2: null, return_question_3: null,
+      return_answer_1: null, return_answer_2: null, return_answer_3: null,
+      return_witness_1: null, return_witness_2: null, return_witness_3: null,
+      capsule_essence: null, capsule_placed: false
+    });
+    location.reload();
+  }
 
   async function rpc(name, body) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
@@ -555,6 +535,7 @@
     }
 
     user = data[0];
+    if (DEBUG) injectDebugReset();
 
     // Eligibility: the return ceremony only makes sense once all three letters are
     // written (current_letter reaches 4 once Letter Three's last question is sent and
@@ -587,7 +568,7 @@
   }
 
   function buildSteps() {
-    const s = [{ type: 'intro' }];
+    const s = [{ type: 'intro' }, { type: 'overview' }];
     LETTERS.forEach((letter, li) => {
       s.push({ type: 'letter-intro', letter });
       for (let q = 0; q < 4; q++) {
@@ -596,6 +577,7 @@
       if (li < LETTERS.length - 1) s.push({ type: 'interlude' });
     });
     s.push({ type: 'arc' });
+    s.push({ type: 'reflect-intro' });
     for (let i = 0; i < 3; i++) {
       s.push({ type: 'reflect-card', reflectIndex: i });
     }
@@ -671,13 +653,32 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
     switch (step.type) {
       case 'intro': return renderIntro();
+      case 'overview': return renderOverview();
       case 'letter-intro': return renderLetterIntro(step);
       case 'letter-card': return renderLetterCard(step);
       case 'interlude': return renderInterlude();
       case 'arc': return renderArc();
+      case 'reflect-intro': return renderReflectIntro();
       case 'reflect-card': return renderReflectCard(step);
       case 'wrap': return renderWrap();
     }
+  }
+
+  // Step backward, skipping over the auto-advancing 'interlude' screens (there's
+  // nothing to look at there — landing on one would just look like a blank page).
+  // Everything else is safe to revisit: the letters are read-only, and reflect-card
+  // itself checks whether it's already been answered and shows the read-only view
+  // instead of a fresh blank form (see renderReflectCard below).
+  function goBack() {
+    if (stepIndex <= 0) return;
+    do {
+      stepIndex--;
+    } while (stepIndex > 0 && steps[stepIndex].type === 'interlude');
+    renderStep();
+  }
+
+  function backLink() {
+    return stepIndex > 0 ? `<button class="back-link" onclick="goBack()">← Back</button>` : '';
   }
 
   // Beat 2 — The capsule opens
@@ -698,6 +699,21 @@
     setTimeout(advance, 900);
   }
 
+  // A short orientation screen, inserted between "the capsule opens" and diving into
+  // the first letter. Without it, the very first thing after opening the capsule was
+  // Letter One's first question — nothing told the user *what kind* of experience
+  // this is (a reread, then something new) before they were already in the middle of
+  // it. First-draft copy — flagging for a voice pass like everything else new here.
+  function renderOverview() {
+    render(`
+      <h1 class="headline">Here's what's about to happen.</h1>
+      <p class="body-copy">You'll read back all three letters you wrote this year — your own words, alongside what Threshold noticed about each one at the time.</p>
+      <p class="body-copy">Once you've read all three, Threshold will share what it noticed across the whole year — and leave you with a few new questions to close this chapter.</p>
+      <button class="btn" onclick="advance()">I'm ready</button>
+      ${backLink()}
+    `);
+  }
+
   // Beat 3 (per-letter intro)
   function renderLetterIntro(step) {
     render(`
@@ -705,53 +721,51 @@
       <h1 class="headline">${step.letter.label}</h1>
       <p class="body-copy">${step.letter.intro}</p>
       <button class="btn" onclick="advance()">Begin reading</button>
+      ${backLink()}
+      ${letterStepper(step.letter.num)}
     `);
   }
 
-  // Beat 3 (tap-to-reveal card per question, mirroring the same ritual answer.html
-  // used when these were first written — this time revealing the old answer + witness
-  // instead of a new blank question)
+  // Bottom letter-stepper for the reading phase: which of the 3 letters is this.
+  // `state` per label: 'current', 'done' (already read), or neither (still ahead).
+  function letterStepper(currentNum) {
+    const spans = LETTERS.map(letter => {
+      const cls = letter.num === currentNum ? 'current' : (letter.num < currentNum ? 'done' : '');
+      return `<span class="${cls}">${letter.label}</span>`;
+    });
+    return `<div class="stepper">${spans.join('<span class="sep">·</span>')}</div>`;
+  }
+
+  // Beat 3 — the question and the answer you wrote a year ago, on the same "paper"
+  // treatment used everywhere else on this page (see the .paper CSS comment).
+  // What Threshold saw about it at the time sits below the paper, not on it — same
+  // reasoning as the new reflection questions: it's commentary on the page, not
+  // part of it.
   function renderLetterCard(step) {
     const { letter, qIndex } = step;
     const globalNum = letter.qStart + qIndex;
     const question = letter.questions[qIndex];
     const answer = user[`answer_${globalNum}`];
     const witness = user[`witness_${globalNum}`];
-    const isLastOfLetter = qIndex === 3;
 
     render(`
       <p class="meta">${letter.label} — Question ${qIndex + 1} of 4</p>
-      <div class="card-scene" id="card-scene" onclick="revealLetterCard()">
-        <div class="card" id="card">
-          <div class="card-face card-front">
-            <p class="card-front-label">Tap to revisit</p>
-            <p class="card-front-cta">Question ${qIndex + 1}</p>
-          </div>
-          <div class="card-face card-back">
-            <p class="card-question-label">${escapeHtml(question)}</p>
-            <p class="card-answer-text">${answer ? escapeHtml(answer) : '(No answer was recorded for this question.)'}</p>
-            ${witness ? `
-              <div class="divider" style="margin: 0.75rem auto;"></div>
-              <p class="card-witness-label">What Threshold saw, then</p>
-              <p class="card-witness-text">${escapeHtml(witness)}</p>
-            ` : ''}
-          </div>
-        </div>
+      <div class="paper fadein">
+        <p class="paper-label">You were asked</p>
+        <p class="paper-question">${escapeHtml(question)}</p>
+        <div class="divider" style="margin: 1.1rem 0;"></div>
+        <p class="paper-answer">${answer ? escapeHtml(answer) : '(No answer was recorded for this question.)'}</p>
       </div>
-      <button class="btn" id="continue-btn" style="display:none;" onclick="advance()">
-        ${isLastOfLetter ? 'Continue' : 'Continue'}
-      </button>
+      ${witness ? `
+        <div class="reflection-block fadein">
+          <p class="reflection-label">What Threshold saw, then</p>
+          <p class="reflection-text">${escapeHtml(witness)}</p>
+        </div>
+      ` : ''}
+      <button class="btn" onclick="advance()">Continue</button>
+      ${backLink()}
+      ${letterStepper(letter.num)}
     `);
-  }
-
-  function revealLetterCard() {
-    const scene = document.getElementById('card-scene');
-    if (scene.classList.contains('revealed')) return;
-    scene.classList.add('revealed');
-    document.getElementById('card').classList.add('flipped');
-    setTimeout(() => {
-      document.getElementById('continue-btn').style.display = 'inline-block';
-    }, 500);
   }
 
   // Quiet pause between letters
@@ -760,7 +774,10 @@
     setTimeout(advance, 2200);
   }
 
-  // Beat 4 — The arc
+  // Beat 4 — what Threshold noticed across the whole year. Renamed from the
+  // internal "the arc" (that's shorthand between Amanda and Claude, not something a
+  // user should ever see) and given a one-line lead-in so it's clear what this is
+  // before diving into a paragraph with no other framing.
   async function renderArc() {
     render(`<p class="loading">Threshold is noticing the shape of your year...</p>`);
     if (!user.arc_reflection) {
@@ -769,14 +786,17 @@
         render(`
           <p class="body-copy">Something went wrong generating your reflection. Please try refreshing this page in a moment.</p>
           <button class="btn" onclick="retryArc()">Try again</button>
+          ${backLink()}
         `);
         return;
       }
     }
     render(`
-      <p class="meta">The Arc</p>
+      <p class="meta">What Threshold Noticed</p>
+      <p class="body-copy" style="font-size: 0.9rem;">After reading all three letters together, here's the shape Threshold saw in your year:</p>
       <p class="body-copy fadein" style="font-size: 1.05rem; line-height: 1.9;">${escapeHtml(user.arc_reflection)}</p>
       <button class="btn" onclick="advance()">Continue</button>
+      ${backLink()}
     `);
   }
 
@@ -798,17 +818,38 @@
     return `<div class="dots">${dots}</div>`;
   }
 
+  // A short explanation before the first new question, so it doesn't feel like the
+  // ceremony is suddenly asking you to do more work with no reason given. Shown
+  // once, right after the arc reflection — going back and forth within the
+  // reflection round itself (see goBack/renderReflectCard) skips straight to
+  // whichever question, not back through this screen every time.
+  function renderReflectIntro() {
+    render(`
+      <h1 class="headline">Three more questions.</h1>
+      <p class="body-copy">Threshold has drawn a few questions from what you've written this year — not to add to the year, but to help you close it.</p>
+      <p class="body-copy">Take your time with these. They're the last thing before you go.</p>
+      <button class="btn" onclick="advance()">Continue</button>
+      ${backLink()}
+    `);
+  }
+
   // Beats 5 & 6 — new reflection questions, typed, saved, and witnessed.
   //
-  // No card flip here (unlike the old-letter cards): those are revisiting something
-  // already sealed, so tap-to-reveal echoes the original sealing ritual. These are
-  // brand-new questions with nothing to reveal, so the question is just... there,
-  // on the page, like something written to you rather than a puzzle to uncover.
+  // If this question was already answered (either earlier this session, or the user
+  // navigated Back into it to reread), skip the blank form and show the read-only
+  // paper + reflection instead — answers here are sealed once witnessed, same
+  // convention as the original 12 questions in answer.html, so Back never re-opens
+  // something for editing.
   function renderReflectCard(step) {
     const { reflectIndex } = step;
     const n = reflectIndex + 1;
     const question = user[`return_question_${n}`];
     const existingAnswer = user[`return_answer_${n}`];
+    const existingWitness = user[`return_witness_${n}`];
+
+    if (existingAnswer && existingWitness) {
+      return renderReflectWitness(n, question, existingAnswer, existingWitness);
+    }
 
     render(`
       <p class="meta">Reflection — Question ${n} of 3</p>
@@ -819,6 +860,7 @@
       </div>
       <p class="body-copy" style="font-size: 0.85rem;">Take your time. There's no right answer — only an honest one.</p>
       <button class="btn" id="submit-btn" onclick="submitReflectAnswer(${n})">Continue</button>
+      ${backLink()}
       ${renderDots(reflectIndex)}
     `);
   }
@@ -881,6 +923,7 @@
         <p class="reflection-text">${escapeHtml(reflection)}</p>
       </div>
       <button class="btn" onclick="advance()">Continue</button>
+      ${backLink()}
       ${renderDots(n - 1)}
     `);
   }
