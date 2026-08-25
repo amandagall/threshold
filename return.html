@@ -95,13 +95,6 @@
       text-wrap: balance;
     }
 
-    /* Left-aligned deliberately, even though .page centers everything else: a
-       multi-sentence paragraph set in centered type reads as ragged/"off" no matter
-       how carefully it's balanced — that's the "wonky" alignment feedback. .paper
-       already made this call for question/answer text; body-copy never got the same
-       treatment. The paragraph block itself still sits centered on the page (via
-       .page's flex align-items:center) — only the text inside it runs left-aligned,
-       same pattern as a centered card with readable left-aligned body text. */
     .body-copy {
       font-size: 1rem;
       line-height: 1.9;
@@ -109,7 +102,12 @@
       max-width: 440px;
       margin-bottom: 1rem;
       text-wrap: balance;
-      text-align: left;
+      /* Centered — inherits .page's text-align. (An earlier pass tried left-aligning
+         this to fix a "wonky" report, on the theory that centered paragraph text
+         always looks ragged. Wrong call — these are short, single-idea lines under a
+         centered headline, not dense prose, and centered is the right read here.
+         Left-align is still the right call inside .paper and .arc-frame below, where
+         the content is longer and reads more like a document than a caption.) */
     }
 
     .body-copy em { color: var(--cream); font-style: italic; }
@@ -850,7 +848,7 @@
       }
     }
     render(`
-      <p class="body-copy" style="font-size: 0.85rem; text-align: center; margin-bottom: 2rem;">After reading all three letters together, here's the shape Threshold saw in your year.</p>
+      <p class="body-copy" style="font-size: 0.85rem; margin-bottom: 2rem;">After reading all three letters together, here's the shape Threshold saw in your year.</p>
       <div class="arc-frame fadein">
         <p class="arc-eyebrow">What Threshold Noticed</p>
         <div class="arc-flourish"></div>
