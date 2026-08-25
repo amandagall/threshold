@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threshold — The Return</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /*
+      TH-48 — Build the witnessed return page
+      Covers beats 2–6 of "Ceremony Two — The Return" only (Experience Design Notes):
+        2. The capsule opens
+        3. Each letter, one at a time (raw answer + persisted witness, quiet pause between)
+        4. The arc
+        5. New reflection questions (typed, saved)
+        6. Every answer witnessed
+      Beats 7–8 (capsule-placing + essence label, evolving room.html into the shelf) are
+      their own tickets (S10, S11) — deliberately not built here. See the "wrap" screen
+      at the end: it closes out beat 6 gracefully without pretending beat 7 exists yet.
+
+      Design language, colors, fonts, and the Supabase call pattern are all copied
+      directly from retirement.html / room.html / answer.html so this feels like the
+      same product, not a bolted-on page.
+    */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1C1C1A;
+      --gold: #C9A96E;
+      --gold-dim: rgba(201, 169, 110, 0.28);
+      --cream: #F2EDE4;
+      --text-muted: rgba(242, 237, 228, 0.42);
+      --card-bg: #2a2820;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Same grain overlay as retirement.html, for visual consistency across the site. */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0.6;
+    }
+
+    .page {
+      max-width: 560px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 3rem 2rem 6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 2.5rem;
+    }
+
+    .meta {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.6;
+      margin-bottom: 2.5rem;
+    }
+
+    .headline {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+      line-height: 1.25;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+      text-wrap: balance;
+    }
+
+    .body-copy {
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      max-width: 440px;
+      margin-bottom: 1rem;
+      text-wrap: balance;
+    }
+
+    .body-copy em { color: var(--cream); font-style: italic; }
+
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold-dim);
+      margin: 1.75rem auto;
+    }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: none;
+      border: 1px solid var(--gold-dim);
+      padding: 0.9rem 2.75rem;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      transition: border-color 0.4s ease, background 0.4s ease;
+    }
+
+    .btn:hover { border-color: var(--gold); background: rgba(201, 169, 110, 0.07); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-quiet {
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      margin-top: 1rem;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .loading { color: var(--text-muted); font-size: 0.9rem; letter-spacing: 0.06em; }
+
+    /* ── Capsule SVGs (sealed / open) — same paths as room.html and retirement.html ── */
+    .capsule-wrap { margin-bottom: 2rem; position: relative; height: 112px; width: 90px; }
+    .capsule-wrap svg { position: absolute; inset: 0; transition: opacity 1.1s ease; }
+    .capsule-sealed { opacity: 1; }
+    .capsule-open { opacity: 0; }
+    .capsule-wrap.opened .capsule-sealed { opacity: 0; }
+    .capsule-wrap.opened .capsule-open { opacity: 1; }
+
+    /* ── Letter card (tap-to-reveal, reusing the same ritual as answer.html) ── */
+    .card-scene {
+      width: 320px;
+      max-width: 100%;
+      height: 300px;
+      perspective: 800px;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      position: relative;
+    }
+    .card-scene.revealed { cursor: default; }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border: 1px solid rgba(201, 169, 110, 0.5);
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.75rem;
+      border-radius: 8px;
+      box-shadow: 0 0 0 1px rgba(201, 169, 110, 0.15), 0 4px 24px rgba(0,0,0,0.4);
+      overflow-y: auto;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+      /* Content here is variable-length (question + old answer + old witness), unlike
+         the fixed short front face — plain `center` clipped long questions at the top
+         with no way to scroll up to them. `safe center` centers short content (most
+         reflection-question cards) but falls back to top-aligned + scrollable the
+         moment content would overflow, instead of clipping silently. */
+      justify-content: safe center;
+      padding-top: 1.75rem;
+    }
+
+    .card-front-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-bottom: 1rem;
+    }
+    .card-front-cta {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--cream);
+      opacity: 0.85;
+    }
+
+    .card-question-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-bottom: 0.75rem;
+    }
+    .card-answer-text {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      line-height: 1.55;
+      color: var(--cream);
+      margin-bottom: 1.1rem;
+      text-wrap: balance;
+    }
+    .card-witness-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.55;
+      margin-bottom: 0.5rem;
+    }
+    .card-witness-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── Writing area for the 3 new reflection questions (mirrors answer.html) ── */
+    .writing-area {
+      width: 100%;
+      max-width: 440px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 1s ease, transform 1s ease;
+      pointer-events: none;
+    }
+    .writing-area.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+    .answer-box {
+      width: 100%;
+      min-height: 180px;
+      background: rgba(242, 237, 228, 0.04);
+      border: 1px solid var(--gold-dim);
+      padding: 1.25rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.9;
+      color: var(--cream);
+      outline: none;
+      resize: vertical;
+      margin-bottom: 0.75rem;
+      text-align: left;
+      transition: border-color 0.3s ease;
+    }
+    .answer-box:focus { border-color: rgba(201, 169, 110, 0.5); }
+    .answer-box::placeholder { color: rgba(242, 237, 228, 0.2); font-style: italic; }
+
+    .witness-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      max-width: 460px;
+    }
+    .witness-view.visible { display: flex; }
+    .witness-text {
+      font-family: 'DM Sans', sans-serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--cream);
+      opacity: 0.9;
+      text-wrap: balance;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fadein { animation: fadeUp 0.8s ease forwards; }
+
+    /* ── Interlude — the "quiet pause" between letters ── */
+    .interlude-mark {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0;
+      animation: breathe 2.4s ease forwards;
+    }
+    @keyframes breathe {
+      0% { opacity: 0; transform: scale(0.6); }
+      40% { opacity: 0.9; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.6); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page" id="page">
+  <p class="wordmark">Threshold</p>
+  <div id="content">
+    <p class="loading">Opening your capsule...</p>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://fvdsizuvdaanstgvhkmt.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2ZHNpenV2ZGFhbnN0Z3Zoa210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODExMjIsImV4cCI6MjA5NTY1NzEyMn0.xQOHZVbndtkkP8VwZeTIQvT7Pu2RFeLCTGYaNzdYQcI';
+
+  // Same 12 questions as answer.html / Documentation's "12 Original Questions" reference.
+  // Labels here use the resolved, user-facing names (The Before / The In Between / The
+  // Arrival) — NOT the "Before/After/Beyond" dev shorthand that room.html still shows on
+  // screen today. That's a pre-existing inconsistency in room.html worth a quick fix
+  // separately; this new page uses the correct names from the start.
+  const LETTERS = [
+    {
+      num: 1,
+      label: 'The Before',
+      intro: 'A year ago, at the edge of everything you knew, you answered four questions honestly.',
+      qStart: 1,
+      questions: [
+        'What part of yourself do you leave in the car every morning before you walk in?',
+        'What would quietly fall apart without you?',
+        'Who at work will you actually miss — and does that surprise you?',
+        'What are you quietly sad about that you haven\'t fully admitted yet?'
+      ]
+    },
+    {
+      num: 2,
+      label: 'The In Between',
+      intro: 'A little further in, when the vertigo of the new middle place had set in, you wrote again.',
+      qStart: 5,
+      questions: [
+        'What does a good day look like now — and how often does one actually happen?',
+        'Is there something you expected to miss that you don\'t? What do you make of that?',
+        'What are you doing with the quiet — and is that working?',
+        'Is there something you keep meaning to start? What\'s actually in the way?'
+      ]
+    },
+    {
+      num: 3,
+      label: 'The Arrival',
+      intro: 'And when something in you had shifted, you wrote one more time — to whoever you\'d be a year on.',
+      qStart: 9,
+      questions: [
+        'What\'s something you used to keep on top of that you\'ve let slide — and how do you actually feel about that?',
+        'What small thing has surprised you by making you genuinely happy?',
+        'What do you know now about yourself that you couldn\'t have known a year ago?',
+        'If the person who wrote Letter One could see you now, what would surprise them most?'
+      ]
+    }
+  ];
+
+  const SEALED_CAPSULE_SVG = `<svg class="capsule-sealed" width="90" height="112" viewBox="-10 -16 100 172" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M34 22 Q34 -6 58 -10 Q82 -6 82 22 Z" fill="#252318" stroke="#C9A96E" stroke-width="2"/>
+    <ellipse cx="58" cy="22" rx="24" ry="6" fill="#1e1c18" stroke="#C9A96E" stroke-width="1.5"/>
+    <rect x="0" y="28" width="50" height="90" fill="#242220" stroke="#C9A96E" stroke-width="2"/>
+    <path d="M0 118 Q0 146 25 150 Q50 146 50 118 Z" fill="#1e1c18" stroke="#C9A96E" stroke-width="2"/>
+    <line x1="0" y1="42" x2="50" y2="42" stroke="#C9A96E" stroke-width="1.2"/>
+    <line x1="0" y1="106" x2="50" y2="106" stroke="#C9A96E" stroke-width="1.2"/>
+    <ellipse cx="25" cy="28" rx="25" ry="6" fill="#141412" stroke="#C9A96E" stroke-width="1.5"/>
+    <circle cx="25" cy="73" r="16" fill="none" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="58" x2="25" y2="62" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="40" y1="73" x2="36" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="88" x2="25" y2="84" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="10" y1="73" x2="14" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="73" x2="18" y2="63" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="25" y1="73" x2="33" y2="64" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
+  </svg>`;
+
+  const OPEN_CAPSULE_SVG = `<svg class="capsule-open" width="90" height="112" viewBox="-2 -8 54 164" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="0" y="28" width="50" height="90" fill="#242220" stroke="#C9A96E" stroke-width="2"/>
+    <path d="M0 28 Q0 0 25 -4 Q50 0 50 28 Z" fill="#2a2820" stroke="#C9A96E" stroke-width="2"/>
+    <path d="M0 118 Q0 146 25 150 Q50 146 50 118 Z" fill="#1e1c18" stroke="#C9A96E" stroke-width="2"/>
+    <line x1="0" y1="42" x2="50" y2="42" stroke="#C9A96E" stroke-width="1.2"/>
+    <line x1="0" y1="106" x2="50" y2="106" stroke="#C9A96E" stroke-width="1.2"/>
+    <circle cx="25" cy="73" r="16" fill="none" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="58" x2="25" y2="62" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="40" y1="73" x2="36" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="88" x2="25" y2="84" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="10" y1="73" x2="14" y2="73" stroke="#C9A96E" stroke-width="1.5"/>
+    <line x1="25" y1="73" x2="18" y2="63" stroke="#C9A96E" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="25" y1="73" x2="33" y2="64" stroke="#C9A96E" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="25" cy="73" r="2" fill="#C9A96E"/>
+  </svg>`;
+
+  // ── State ────────────────────────────────────────────────────────────────
+  let token = null;
+  let user = null;
+  let steps = [];
+  let stepIndex = 0;
+  let returnWitnessPromise = null; // kicked off early so it's ready by the time we need it
+
+  async function rpc(name, body) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(body)
+    });
+    return res;
+  }
+
+  async function persist(updates) {
+    // Best-effort, same pattern as answer.html's witness persistence: if this fails,
+    // the user still sees what they need to see on screen right now, it just might not
+    // be there if they leave and come back. We don't block the UI on it.
+    try {
+      await rpc('update_signup_by_token', { p_token: token, p_updates: updates });
+    } catch (err) {
+      console.error('Persist failed:', updates, err);
+    }
+  }
+
+  function render(html) {
+    document.getElementById('content').innerHTML = html;
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────────────────
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    token = params.get('token');
+
+    if (!token) {
+      render(`<p class="body-copy">No token found. Please use the link from your email.</p>`);
+      return;
+    }
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_signup_by_token`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_token: token })
+    });
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      render(`<p class="body-copy">We couldn't find your capsule. Please use the link from your email.</p>`);
+      return;
+    }
+
+    user = data[0];
+
+    // Eligibility: the return ceremony only makes sense once all three letters are
+    // written (current_letter reaches 4 once Letter Three's last question is sent and
+    // answered — same convention cron-send-questions.js uses).
+    if ((user.current_letter || 1) < 4) {
+      render(`
+        <p class="body-copy">Your letters are still finding their way to you. This part of the journey opens once all three have been written.</p>
+        <a class="btn" href="/room?token=${token}" style="text-decoration:none; display:inline-block;">Return to your capsule</a>
+      `);
+      return;
+    }
+
+    // If the return round is already fully answered and witnessed, don't replay the
+    // whole ceremony — TH-48's scope ends at beat 6, so just say so.
+    if (user.return_answer_1 && user.return_answer_2 && user.return_answer_3) {
+      renderWrap();
+      return;
+    }
+
+    // If the arc + questions were already generated in a previous visit, don't call
+    // the AI again (it would generate different text and break resumability) — reuse
+    // what's persisted.
+    if (!user.return_question_1) {
+      kickOffReturnWitness();
+    }
+
+    steps = buildSteps();
+    stepIndex = resumeIndex();
+    renderStep();
+  }
+
+  function buildSteps() {
+    const s = [{ type: 'intro' }];
+    LETTERS.forEach((letter, li) => {
+      s.push({ type: 'letter-intro', letter });
+      for (let q = 0; q < 4; q++) {
+        s.push({ type: 'letter-card', letter, qIndex: q });
+      }
+      if (li < LETTERS.length - 1) s.push({ type: 'interlude' });
+    });
+    s.push({ type: 'arc' });
+    for (let i = 0; i < 3; i++) {
+      s.push({ type: 'reflect-card', reflectIndex: i });
+    }
+    s.push({ type: 'wrap' });
+    return s;
+  }
+
+  // Reconstruct where the user left off from what's already persisted, since the
+  // schema deliberately has no separate progress column for this round (see
+  // Documentation → Return Ceremony Persistence — "the return round is likely answered
+  // in one sitting, so a later ticket may hold that client-side instead"). We hold it
+  // here by inspecting return_answer_1/2/3.
+  function resumeIndex() {
+    if (!user.return_question_1) return 0; // hasn't generated the arc/questions yet — start from the top
+    const arcIndex = steps.findIndex(s => s.type === 'arc');
+    if (!user.return_answer_1) return arcIndex;
+    const firstUnanswered = ['return_answer_1', 'return_answer_2', 'return_answer_3']
+      .findIndex(key => !user[key]);
+    if (firstUnanswered === -1) return steps.findIndex(s => s.type === 'wrap');
+    return steps.findIndex(s => s.type === 'reflect-card' && s.reflectIndex === firstUnanswered);
+  }
+
+  // Wraps fetchReturnWitness() and attaches a .catch immediately, synchronously, when
+  // the request is kicked off. This isn't just tidiness: if the request fails while the
+  // user is still reading their letters (a while later, from the browser's point of
+  // view), an un-caught rejection on a promise nobody has attached a handler to yet
+  // triggers a browser "unhandled rejection" warning even though renderArc()'s own
+  // try/catch does eventually await and handle it. Converting the rejection into a
+  // resolved { __error: true } sentinel here means the promise itself never rejects,
+  // so there's nothing left unhandled — renderArc() just checks the sentinel instead.
+  function kickOffReturnWitness() {
+    returnWitnessPromise = fetchReturnWitness().catch(err => {
+      console.error('return-witness fetch failed:', err);
+      return { __error: true };
+    });
+  }
+
+  async function fetchReturnWitness() {
+    const letters = LETTERS.map(letter => ({
+      label: letter.label,
+      questions: letter.questions,
+      answers: letter.questions.map((_, i) => user[`answer_${letter.qStart + i}`] || '')
+    }));
+    const res = await fetch('/api/return-witness', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ letters })
+    });
+    if (!res.ok) throw new Error('return-witness request failed');
+    const parsed = await res.json();
+    // Persist immediately so a refresh or an early exit doesn't lose it, and so we
+    // never call the AI twice for the same person.
+    await persist({
+      arc_reflection: parsed.arc_reflection,
+      return_question_1: parsed.questions[0],
+      return_question_2: parsed.questions[1],
+      return_question_3: parsed.questions[2]
+    });
+    user.arc_reflection = parsed.arc_reflection;
+    user.return_question_1 = parsed.questions[0];
+    user.return_question_2 = parsed.questions[1];
+    user.return_question_3 = parsed.questions[2];
+    return parsed;
+  }
+
+  function advance() {
+    stepIndex++;
+    renderStep();
+  }
+
+  function renderStep() {
+    const step = steps[stepIndex];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    switch (step.type) {
+      case 'intro': return renderIntro();
+      case 'letter-intro': return renderLetterIntro(step);
+      case 'letter-card': return renderLetterCard(step);
+      case 'interlude': return renderInterlude();
+      case 'arc': return renderArc();
+      case 'reflect-card': return renderReflectCard(step);
+      case 'wrap': return renderWrap();
+    }
+  }
+
+  // Beat 2 — The capsule opens
+  function renderIntro() {
+    render(`
+      <div class="capsule-wrap fadein" id="capsule-wrap">
+        ${SEALED_CAPSULE_SVG}
+        ${OPEN_CAPSULE_SVG}
+      </div>
+      <h1 class="headline">Welcome back, ${escapeHtml((user.name || '').split(' ')[0] || 'friend')}.</h1>
+      <p class="body-copy">A year ago, you sealed three letters and let them go. <em>Today, they return to you.</em></p>
+      <button class="btn" onclick="openCapsule()">Open your capsule</button>
+    `);
+  }
+
+  function openCapsule() {
+    document.getElementById('capsule-wrap').classList.add('opened');
+    setTimeout(advance, 900);
+  }
+
+  // Beat 3 (per-letter intro)
+  function renderLetterIntro(step) {
+    render(`
+      <p class="meta">Letter ${step.letter.num} of 3</p>
+      <h1 class="headline">${step.letter.label}</h1>
+      <p class="body-copy">${step.letter.intro}</p>
+      <button class="btn" onclick="advance()">Begin reading</button>
+    `);
+  }
+
+  // Beat 3 (tap-to-reveal card per question, mirroring the same ritual answer.html
+  // used when these were first written — this time revealing the old answer + witness
+  // instead of a new blank question)
+  function renderLetterCard(step) {
+    const { letter, qIndex } = step;
+    const globalNum = letter.qStart + qIndex;
+    const question = letter.questions[qIndex];
+    const answer = user[`answer_${globalNum}`];
+    const witness = user[`witness_${globalNum}`];
+    const isLastOfLetter = qIndex === 3;
+
+    render(`
+      <p class="meta">${letter.label} — Question ${qIndex + 1} of 4</p>
+      <div class="card-scene" id="card-scene" onclick="revealLetterCard()">
+        <div class="card" id="card">
+          <div class="card-face card-front">
+            <p class="card-front-label">Tap to revisit</p>
+            <p class="card-front-cta">Question ${qIndex + 1}</p>
+          </div>
+          <div class="card-face card-back">
+            <p class="card-question-label">${escapeHtml(question)}</p>
+            <p class="card-answer-text">${answer ? escapeHtml(answer) : '(No answer was recorded for this question.)'}</p>
+            ${witness ? `
+              <div class="divider" style="margin: 0.75rem auto;"></div>
+              <p class="card-witness-label">What Threshold saw, then</p>
+              <p class="card-witness-text">${escapeHtml(witness)}</p>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+      <button class="btn" id="continue-btn" style="display:none;" onclick="advance()">
+        ${isLastOfLetter ? 'Continue' : 'Continue'}
+      </button>
+    `);
+  }
+
+  function revealLetterCard() {
+    const scene = document.getElementById('card-scene');
+    if (scene.classList.contains('revealed')) return;
+    scene.classList.add('revealed');
+    document.getElementById('card').classList.add('flipped');
+    setTimeout(() => {
+      document.getElementById('continue-btn').style.display = 'inline-block';
+    }, 500);
+  }
+
+  // Quiet pause between letters
+  function renderInterlude() {
+    render(`<div class="interlude-mark"></div>`);
+    setTimeout(advance, 2200);
+  }
+
+  // Beat 4 — The arc
+  async function renderArc() {
+    render(`<p class="loading">Threshold is noticing the shape of your year...</p>`);
+    if (!user.arc_reflection) {
+      const result = await returnWitnessPromise;
+      if (!result || result.__error) {
+        render(`
+          <p class="body-copy">Something went wrong generating your reflection. Please try refreshing this page in a moment.</p>
+          <button class="btn" onclick="retryArc()">Try again</button>
+        `);
+        return;
+      }
+    }
+    render(`
+      <p class="meta">The Arc</p>
+      <p class="body-copy fadein" style="font-size: 1.05rem; line-height: 1.9;">${escapeHtml(user.arc_reflection)}</p>
+      <button class="btn" onclick="advance()">Continue</button>
+    `);
+  }
+
+  function retryArc() {
+    kickOffReturnWitness();
+    renderArc();
+  }
+
+  // Beats 5 & 6 — new reflection questions, typed, saved, and witnessed
+  function renderReflectCard(step) {
+    const { reflectIndex } = step;
+    const n = reflectIndex + 1;
+    const question = user[`return_question_${n}`];
+    const existingAnswer = user[`return_answer_${n}`];
+
+    render(`
+      <p class="meta">Reflection — Question ${n} of 3</p>
+      <div class="card-scene" id="card-scene" onclick="revealReflectQuestion()">
+        <div class="card" id="card">
+          <div class="card-face card-front">
+            <p class="card-front-label">Your question awaits</p>
+            <p class="card-front-cta">Reveal Question ${n}</p>
+          </div>
+          <div class="card-face card-back">
+            <p class="card-answer-text">${escapeHtml(question)}</p>
+          </div>
+        </div>
+      </div>
+      <div class="writing-area" id="writing-area">
+        <p class="body-copy" style="font-size:0.88rem; text-align:left;">Take your time. There's no right answer — only an honest one.</p>
+        <textarea class="answer-box" id="answer-input" placeholder="Begin writing here...">${existingAnswer ? escapeHtml(existingAnswer) : ''}</textarea>
+        <button class="btn" id="submit-btn" onclick="submitReflectAnswer(${n})">Continue</button>
+      </div>
+      <div class="witness-view" id="witness-view">
+        <p class="meta" style="margin-bottom:1rem;">A reflection</p>
+        <p class="witness-text" id="witness-text"></p>
+        <button class="btn" onclick="advance()">Continue</button>
+      </div>
+    `);
+  }
+
+  function revealReflectQuestion() {
+    const scene = document.getElementById('card-scene');
+    if (scene.classList.contains('revealed')) return;
+    scene.classList.add('revealed');
+    document.getElementById('card').classList.add('flipped');
+    setTimeout(() => {
+      document.getElementById('writing-area').classList.add('visible');
+    }, 900);
+  }
+
+  async function submitReflectAnswer(n) {
+    const answer = document.getElementById('answer-input').value.trim();
+    if (!answer) { alert('Please write something before continuing.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Receiving...';
+
+    const question = user[`return_question_${n}`];
+    await persist({ [`return_answer_${n}`]: answer });
+    user[`return_answer_${n}`] = answer;
+
+    let reflection = null;
+    try {
+      // Reuses the existing /api/witness endpoint unchanged — per TH-47, witnessing a
+      // return answer needed zero new backend code.
+      const res = await fetch('/api/witness', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer })
+      });
+      const data = await res.json();
+      reflection = data.reflection;
+      if (reflection) {
+        await persist({ [`return_witness_${n}`]: reflection });
+        user[`return_witness_${n}`] = reflection;
+      }
+    } catch (err) {
+      console.error('Witness error:', err);
+    }
+
+    document.getElementById('card-scene').style.display = 'none';
+    document.getElementById('writing-area').classList.remove('visible');
+
+    if (reflection) {
+      document.getElementById('witness-text').textContent = reflection;
+      const wv = document.getElementById('witness-view');
+      wv.classList.add('visible', 'fadein');
+    } else {
+      // Same graceful-degradation pattern as answer.html: if the witness call fails,
+      // don't block the user — just move on.
+      advance();
+    }
+  }
+
+  // End of TH-48's scope. Beats 7 (capsule-placing + essence label) and 8 (the shelf)
+  // are S10/S11 — not built yet, so this closes the loop honestly rather than faking
+  // a "placing" interaction that doesn't exist.
+  function renderWrap() {
+    render(`
+      <p class="meta">The Return</p>
+      <h1 class="headline">Threshold has witnessed this year with you.</h1>
+      <p class="body-copy">The rest of this ceremony — placing your capsule to rest, and giving this year its own name — is still being built. For now, what you wrote has been heard and kept safe.</p>
+      <a class="btn" href="/room?token=${token}" style="text-decoration:none; display:inline-block;">Return to your capsule</a>
+    `);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  init();
+</script>
+
+</body>
+</html>
